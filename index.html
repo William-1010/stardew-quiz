@@ -1308,13 +1308,13 @@ function hsh(hex,dl,ds,dh){ const [h,s,l]=rgb2hsl(hex2rgb(hex)); return rgb2hex(
 function mix(a,b,t){ const A=hex2rgb(a),B=hex2rgb(b); return rgb2hex(A.map((v,i)=>v*(1-t)+B[i]*t)); }
 
 function avPalette(A){
-  const skin=AV_SKIN[A.skin], sat=rgb2hsl(hex2rgb(skin))[1];
+  const skin=(typeof A.skin==="string"&&A.skin[0]==="#")?A.skin:(AV_SKIN[A.skin]||AV_SKIN[2]);
   const P={skin};
   P.skinH=mix(tint(skin,.28),"#fff6e0",.25);
   P.skinS=hsh(skin,.84,.22,-5);          // 橙红偏的阴影
   P.skinD=hsh(skin,.62,.32,-11);
   P.skinO=mix(hsh(skin,.40,.30,-18),"#4a1830",.35);   // 暗红棕描边
-  const hc=AV_HAIR[A.hairCol], hs=rgb2hsl(hex2rgb(hc));
+  const hc=AV_HAIR[A.hairCol]||(typeof A.hairCol==="string"&&A.hairCol[0]==="#"?A.hairCol:AV_HAIR.darkbrown), hs=rgb2hsl(hex2rgb(hc));
   P.hc=hc;
   if(hs[1]<.18){  // 黑/灰发：往蓝紫偏
     P.hcL=mix(tint(hc,.22),"#7a6cb0",.38); P.hcS=mix(shade(hc,.80),"#3a2a5c",.35); P.hcD=mix(shade(hc,.55),"#2a1c48",.45); P.hcO=mix(shade(hc,.35),"#160b2e",.55);
@@ -1322,7 +1322,7 @@ function avPalette(A){
     const warm=hs[0]<70||hs[0]>300;      // 暖色头发阴影偏红，冷色偏紫蓝
     P.hcL=mix(tint(hc,.30),warm?"#fff0b8":"#e0f0ff",.22); P.hcS=hsh(hc,.74,.10,warm?-8:6); P.hcD=hsh(hc,.52,.16,warm?-14:10); P.hcO=mix(hsh(hc,.32,.20,warm?-18:14),"#1a0c34",.40);
   }
-  const sh=AV_SHIRT[A.shirt], ss=rgb2hsl(hex2rgb(sh))[1];
+  const sh=(typeof A.shirt==="string"&&A.shirt[0]==="#")?A.shirt:(AV_SHIRT[A.shirt]||AV_SHIRT[0]), ss=rgb2hsl(hex2rgb(sh))[1];
   P.sh=sh; P.shL=tint(sh,.30); P.shS=ss<.15?mix(shade(sh,.78),"#3a3060",.3):hsh(sh,.74,.12,-6); P.shD=ss<.15?mix(shade(sh,.55),"#2a2048",.4):hsh(sh,.52,.18,-10); P.shO=mix(shade(sh,.32),"#180c30",.45);
   P.eyeD="#2e1c22"; P.white="#fff6f0";
   const ec=A.eyeCol||"#5a3a22"; P.iris=lumc(hex2rgb(ec))<60?tint(ec,.25):ec; P.pupil=shade(P.iris,.45); P.irisL=tint(P.iris,.45);
@@ -1442,7 +1442,7 @@ function drawAvatarGrid(A, sceneName){
   if(A.hair==="curly") for(let y=0;y<CY+12;y++) for(let x=0;x<N;x++){ if(L[y*N+x]!==2) continue; const c=get(x,y); if(c===P.hcO) continue;
       const u=x%5, v=(y+((x/5|0)%2)*2)%5; if((u===1&&v===0)||(u===0&&v===1)||(u===2&&v===1)||(u===1&&v===2)) set(x,y,c===P.hcS?P.hc:P.hcL); else if(u===1&&v===1) set(x,y,P.hcS); }
   // 发尾挑染
-  if(A.tips&&A.hair!=="buzz"){ const tc=AV_HAIR[A.tips], tcL=tint(tc,.25), tcD=hsh(tc,.6,.1,0);
+  if(A.tips&&A.hair!=="buzz"){ const tc=AV_HAIR[A.tips]||A.tips, tcL=tint(tc,.25), tcD=hsh(tc,.6,.1,0);
     for(let x=0;x<N;x++){ if(Math.abs(x+.5-cx)<CHEEK-7) continue; let n2=0; for(let y=N-1;y>=0&&n2<5;y--){ if(L[y*N+x]===2&&get(x,y)!==P.hcO){ set(x,y,n2===0?tcD:n2<3?tc:tcL); n2++; } else if(n2) break; } } }
 
   // ---- 五官 ----
