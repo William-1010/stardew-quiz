@@ -220,7 +220,7 @@ button.other:hover{background:#fff3d6}
 <canvas id="bg" aria-hidden="true"></canvas>
 <div id="hud"></div>
 <main class="wrap"><div class="frame"><div class="panel" id="app"></div></div>
-  <div class="foot" id="foot">辣椒小闪出品 · 非官方粉丝作品 · 游戏素材 © ConcernedApe</div></main>
+  <div class="foot" id="foot">辣椒小闪出品 · 非官方粉丝作品 · 游戏画面与音乐 © ConcernedApe</div></main>
 <div id="overlay" class="ov"></div>
 <script>
 const TRAIT_KEYS = ["soc","art","sci","adv","nat","care","edge","amb","home"];
@@ -299,7 +299,7 @@ const I18N = {
     avGlasses:"眼镜", avBeard:"胡子", avBlush:"腮红",
     idSave:"保存图片", idSaved:"已保存", idSaveFail:"没能保存。你也可以长按或右键下面的图片保存。",
     idLongPress:"长按或右键图片也可以保存。",
-    foot:"辣椒小闪出品 · 非官方粉丝作品 · 游戏素材 © ConcernedApe",
+    foot:"辣椒小闪出品 · 非官方粉丝作品 · 游戏画面与音乐 © ConcernedApe",
     card:{head:"星露谷 · 鹈鹕镇居民证", name:"姓名", farm:"农场", fav:"最爱", like:"最像", mbti:"MBTI", love:"心仪", since:"入住", sinceV:"第1年 春季1日", no:"编号", foot:"辣椒小闪出品 · 仅供娱乐 · 非官方证件"},
     copy:"复制结果去分享", again:"再过一年", copied:"已复制，可以粘贴给朋友了",
     share:(c,t,m,s,p)=>`我在「星露谷人格测试」里测出来是【${c}】（${t}），MBTI 粗测 ${m}，最适合和${s}结婚（契合度 ${p}%）。你是谁？`,
@@ -386,7 +386,7 @@ const I18N = {
     avGlasses:"Glasses", avBeard:"Beard", avBlush:"Blush",
     idSave:"Save image", idSaved:"Saved", idSaveFail:"Couldn't save. You can also long-press or right-click the image below.",
     idLongPress:"You can also long-press or right-click the image to save it.",
-    foot:"Made by 辣椒小闪 (Lajiao Xiaoshan) · Unofficial fan project · Game art © ConcernedApe",
+    foot:"Made by 辣椒小闪 (Lajiao Xiaoshan) · Unofficial fan project · Game art &amp; music © ConcernedApe",
     card:{head:"STARDEW VALLEY · PELICAN TOWN RESIDENT", name:"Name", farm:"Farm", fav:"Loves", like:"Most like", mbti:"MBTI", love:"Sweetheart", since:"Moved in", sinceV:"Year 1, Spring 1", no:"No.", foot:"By 辣椒小闪 · for fun · not an official document"},
     copy:"Copy result to share", again:"Play another year", copied:"Copied! Paste it to a friend.",
     share:(c,t,m,s,p)=>`I took the Stardew Personality Quiz and got ${c} (${t}). Rough MBTI: ${m}. Best match: ${s} (${p}%). Who are you?`,
@@ -767,39 +767,37 @@ function drawBG(t){
 }
 const CHICKEN_FR = CHICK.map(f=>spriteCanvas(f,CHICK_PAL,1));
 requestAnimationFrame(drawBG);
-function setSeason(s){ if(S.season!==s){ S.season=s; resetParts(); } }
+function setSeason(s){ if(S.season!==s){ S.season=s; resetParts(); } updateMusic(); }
 
-/* =============== 音乐与音效（原创旋律） =============== */
-let AC=null, musicTimer=null, nextT=0, step=0;
-const N = (n)=>440*Math.pow(2,(n-69)/12);
-const nm = {C4:60,D4:62,E4:64,F4:65,G4:67,A4:69,B4:71,C5:72,D5:74,E5:76,F5:77,G5:79,A5:81,G3:55,A3:57,B3:59,C3:48,D3:50,E3:52,F3:53,G2:43};
-// 每项 [音, 拍]；一拍 = 一个四分音符
-const MEL = [["G4",1],["B4",.5],["D5",.5],["E5",1],["D5",1],["B4",1],["A4",.5],["G4",.5],["A4",2],["G4",1],["B4",.5],["D5",.5],["G5",1],["E5",1],["D5",1.5],["B4",.5],["D5",2],
-             ["E5",1],["D5",.5],["B4",.5],["C5",1],["A4",1],["B4",1],["G4",.5],["E4",.5],["D4",2],["E4",1],["G4",.5],["A4",.5],["B4",1],["D5",1],["A4",1.5],["B4",.5],["G4",2]];
-const BASS = ["G2","D3","G2","D3","C3","G2","C3","D3"];
+/* =============== 音乐与音效 =============== */
+/* BGM：游戏原曲（© ConcernedApe），开场和结果页放主题曲，答题时按季节切换 */
+let AC=null;
+const BGM_SRC={theme:"assets/music/theme.mp3",spring:"assets/music/spring.mp3",summer:"assets/music/summer.mp3",fall:"assets/music/fall.mp3",winter:"assets/music/winter.mp3"};
+const SEASON_TRACK={sp:"spring",su:"summer",fa:"fall",wi:"winter"};
+const BGM_VOL=.55;
+let bgmEl=null, curTrack=null, fadeTimer=null;
+function bgmTrack(){ return (S.screen==="q"||S.screen==="gender") ? (SEASON_TRACK[S.season]||"spring") : "theme"; }
+function fadeTo(el, target, ms, done){
+  clearInterval(fadeTimer); const from=el.volume, steps=Math.max(1,Math.round(ms/40)); let k=0;
+  fadeTimer=setInterval(()=>{ k++; el.volume=Math.max(0,Math.min(1,from+(target-from)*k/steps)); if(k>=steps){ clearInterval(fadeTimer); fadeTimer=null; if(done) done(); } },40);
+}
+function updateMusic(){
+  if(!S.sound) return;
+  const tr=bgmTrack(); if(tr===curTrack&&bgmEl&&!bgmEl.paused) return;
+  if(!bgmEl){ bgmEl=new Audio(); bgmEl.loop=true; bgmEl.preload="auto"; bgmEl.volume=0; }
+  const play=()=>{ curTrack=tr; bgmEl.src=BGM_SRC[tr]; bgmEl.currentTime=0; bgmEl.volume=0; const pr=bgmEl.play(); if(pr&&pr.catch) pr.catch(()=>{}); fadeTo(bgmEl,BGM_VOL,900); };
+  if(curTrack&&!bgmEl.paused&&curTrack!==tr) fadeTo(bgmEl,0,500,play); else play();
+}
+function startMusic(){
+  try{ AC = AC || new (window.AudioContext||window.webkitAudioContext)(); AC.resume(); }catch(e){}
+  curTrack=null; updateMusic();
+}
+function stopMusic(){ clearInterval(fadeTimer); if(bgmEl){ bgmEl.pause(); } curTrack=null; if(AC){ AC.close(); AC=null; } }
 function tone(freq, t, dur, type, vol){
   const o=AC.createOscillator(), g=AC.createGain(); o.type=type; o.frequency.value=freq;
   g.gain.setValueAtTime(0,t); g.gain.linearRampToValueAtTime(vol,t+.01); g.gain.exponentialRampToValueAtTime(.0001,t+dur);
   o.connect(g); g.connect(AC.destination); o.start(t); o.stop(t+dur+.05);
 }
-const BEAT = 60/96;
-let melTimes=null;
-function scheduleMusic(){
-  if(!melTimes){ melTimes=[]; let b=0; MEL.forEach(m=>{melTimes.push(b); b+=m[1];}); melTimes.total=b; }
-  while(nextT < AC.currentTime + 0.4){
-    const loopStart = nextT; const total=melTimes.total;
-    MEL.forEach((m,i)=>{ const t=loopStart+melTimes[i]*BEAT; tone(N(nm[m[0]]),t,m[1]*BEAT*.9,"triangle",.07); });
-    for(let bar=0;bar<total/4;bar++){ const root=nm[BASS[bar%BASS.length]];
-      for(let q=0;q<4;q++){ const t=loopStart+(bar*4+q)*BEAT; tone(N(root+(q%2?7:0)),t,BEAT*.6,"square",.018); } }
-    nextT = loopStart + total*BEAT;
-  }
-}
-function startMusic(){
-  try{ AC = AC || new (window.AudioContext||window.webkitAudioContext)(); AC.resume(); }catch(e){ return; }
-  nextT = AC.currentTime + .1; melTimes=null; scheduleMusic();
-  musicTimer = setInterval(()=>{ if(AC.currentTime > nextT - 1) scheduleMusic(); }, 300);
-}
-function stopMusic(){ clearInterval(musicTimer); musicTimer=null; if(AC){ AC.close(); AC=null; } }
 function sfx(kind){
   if(!S.sound || !AC) return; const t=AC.currentTime;
   if(kind==="pick"){ tone(880,t,.06,"square",.04); tone(1320,t+.05,.07,"square",.035); }
