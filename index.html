@@ -227,6 +227,7 @@ button.other:hover{background:#fff3d6}
 .logo-big{text-wrap:balance}
 @media (max-width:540px){.logo-big{font-size:30px;letter-spacing:0;text-shadow:2px 0 0 var(--wood-dd),-2px 0 0 var(--wood-dd),0 2px 0 var(--wood-dd),0 -2px 0 var(--wood-dd),2px 2px 0 var(--wood-dd),-2px 2px 0 var(--wood-dd),2px -2px 0 var(--wood-dd),-2px -2px 0 var(--wood-dd),0 5px 0 #3a1f0c}.ov-title{font-size:30px}.h2{font-size:30px}.big{font-size:30px}.mbti-big{font-size:30px}}
 .qtext{font-weight:500}
+.resume{background:#fff8e6;box-shadow:0 0 0 3px var(--accent);padding:14px 16px;margin:0 0 18px;text-align:center}.resume p{margin:0 0 8px}.resume .note{margin:8px 0 0;font-size:13px}
 .gpick{display:flex;gap:16px;justify-content:center;margin:8px 0 4px}
 .gopt{font:inherit;display:grid;justify-items:center;gap:6px;padding:10px 12px;background:#fff8e6;border:none;cursor:pointer;box-shadow:0 0 0 3px var(--paper3);color:var(--ink)}
 .gopt canvas{width:128px;height:128px;image-rendering:pixelated;display:block}
@@ -838,7 +839,7 @@ function renderHud(){
 
 /* =============== 页面 =============== */
 function render(){
-  ({intro:renderIntro, create:renderCreate, q:renderQ, gender:renderGender, result:renderResult})[S.screen]();
+  ({intro:renderIntro, create:renderCreate, q:renderQ, gender:renderGender, result:renderResult})[S.screen](); if(S.screen!=="intro") saveProgress();
 }
 function goto(screen){ closeProfile(); S.screen=screen; render(); window.scrollTo({top:0,behavior:"smooth"}); }
 
@@ -847,6 +848,7 @@ function renderIntro(){
   app.innerHTML = `
     <div class="fade">
       <div class="logo"><span class="logo-big">${esc(T().title)}</span><span class="logo-sub">${esc(T().sub)}</span></div>
+      ${resumeHTML()}
       <div class="letter">
         <p class="letter-head">${esc(T().letterHead)}</p>
         ${T().letter.map(p=>`<p>${esc(p)}</p>`).join("")}
@@ -855,6 +857,21 @@ function renderIntro(){
       <div class="center"><button class="btn" id="start">${esc(T().start)}</button></div>
     </div>`;
   document.getElementById("start").onclick = ()=>{ sfx("pick"); goto("create"); };
+  bindResume();
+}
+function resumeHTML(){
+  if(!RESUME) return ""; const t=T(), d=RESUME, nQ=QUESTIONS.filter(q=>!q.pref).length;
+  const msg= d.screen==="result"? t.resumeDone : d.screen==="gender"? t.resumeLast(nQ) : t.resumeAt(Math.min(d.idx+1,nQ),nQ);
+  const go= d.screen==="result"? t.resumeSee : t.resumeGo, again= d.screen==="result"? t.resumeRedo : t.resumeRestart;
+  return `<div class="resume"><p>${esc(msg)}</p><div class="actions"><button class="btn" id="resGo">${esc(go)}</button><button class="btn ghost" id="resNew">${esc(again)}</button></div><p class="note">${esc(t.resumeNote)}</p></div>`;
+}
+function bindResume(){
+  const go=document.getElementById("resGo"); if(!go) return;
+  go.onclick=()=>{ const d=RESUME; RESUME=null; sfx("pick");
+    S.answers=d.answers.slice(); S.gender=d.gender; S.idx=Math.min(d.idx,QUESTIONS.length-1);
+    if(d.screen==="result"&&d.gender){ S.result=compute(S.answers,S.gender); goto("result"); }
+    else goto(d.screen==="gender"?"gender":"q"); };
+  document.getElementById("resNew").onclick=()=>{ RESUME=null; sfx("pick"); S.idx=0; S.answers=[]; S.gender=null; S.result=null; S.cardMade=false; saveProgress(); render(); };
 }
 
 function renderCreate(){
@@ -875,6 +892,7 @@ function renderCreate(){
     sfx("pick"); S.idx=0; S.answers=[]; S.gender=null;
     seasonCard("sp", ()=>goto("q"));
   };
+  [["fName","name"],["fFarm","farm"],["fFav","fav"]].forEach(([id,k])=>document.getElementById(id).oninput=e=>{ S.farmer[k]=e.target.value.trim(); });
   document.getElementById("ok").onclick=()=>begin(true);
   document.getElementById("skip").onclick=()=>begin(false);
 }
@@ -1179,7 +1197,7 @@ function renderResult(){
       <div class="sources"><b>${esc(t.srcT)}</b><br>${t.src.map(esc).join("<br>")}
         <br><a href="https://stardewvalleywiki.com/" target="_blank" rel="noopener">Stardew Valley Wiki</a> · <a href="https://zh.stardewvalleywiki.com/" target="_blank" rel="noopener">${S.lang==="zh"?"星露谷物语中文维基":"Stardew Valley Wiki (Chinese)"}</a> · <a href="https://www.personalitopia.com/stardew-valley-mbti-types/" target="_blank" rel="noopener">Personalitopia</a> · <a href="https://github.com/TakWolf/fusion-pixel-font" target="_blank" rel="noopener">Fusion Pixel Font</a></div>
     </div>`;
-  document.getElementById("again").onclick=()=>{ sfx("pick"); S.idGender=null; S.idScene="auto"; S.cardMade=false; goto("intro"); };
+  document.getElementById("again").onclick=()=>{ sfx("pick"); S.idGender=null; S.idScene="auto"; S.cardMade=false; S.idx=0; S.answers=[]; S.gender=null; S.result=null; RESUME=null; saveProgress(); goto("intro"); };
   document.getElementById("copy").onclick=async()=>{ const el=document.getElementById("toast");
     try{ await navigator.clipboard.writeText(lastShare); el.textContent=t.copied; }catch(e){ el.textContent=lastShare; } };
   ["cName","cFarm","cFav"].forEach((k,i)=>document.getElementById(k).oninput=e=>{ S.farmer[["name","farm","fav"][i]]=e.target.value.trim(); });
@@ -1247,9 +1265,23 @@ async function makeCard(quiet){
   out.innerHTML=`<img class="idimg" src="${url}" alt="${esc(t.idT)}"><div class="actions" id="saveRow"></div><p class="note" id="saveNote">${esc(t.idLongPress)}</p>`;
   const row=document.getElementById("saveRow");
   const dl = await getDownloads();
-  if(!dl){
-    // 独立部署时（不在 claude.ai 里），用普通的下载链接
+  const ua=navigator.userAgent||"", inApp=/MicroMessenger|XiaoHongShu|xhsdiscover|Weibo|QQ\//i.test(ua);
+  const isIOS=/iPhone|iPad|iPod/i.test(ua)||(navigator.platform==="MacIntel"&&navigator.maxTouchPoints>1), isAndroid=/Android/i.test(ua);
+  const note=document.getElementById("saveNote");
+  const blob=await new Promise(r=>cv.toBlob(r,"image/png")), file=blob&&new File([blob],"stardew-id.png",{type:"image/png"});
+  const canShareFile=!!(file&&navigator.canShare&&(()=>{ try{ return navigator.canShare({files:[file]}); }catch(e){ return false; } })());
+  if(!dl&&inApp){
+    // 微信、小红书等 App 内置浏览器不支持下载：只能长按图片保存到相册
+    row.innerHTML=""; note.textContent=t.idSaveInApp;
+  } else if(!dl&&(isIOS||isAndroid)&&canShareFile){
+    // 手机：弹出系统分享面板，iPhone 选「存储图像」就进「照片」
+    row.innerHTML=`<button class="btn" id="saveId">${esc(t.idSavePhone)}</button>`;
+    note.textContent=isIOS?t.idSaveIOS:t.idSaveAndroid;
+    document.getElementById("saveId").onclick=async()=>{ try{ await navigator.share({files:[file]}); }catch(e){ if(e&&e.name!=="AbortError") note.textContent=t.idSaveFail; } };
+  } else if(!dl){
+    // 电脑浏览器或不支持分享的手机：普通下载
     row.innerHTML=`<a class="btn" id="saveId" href="${url}" download="stardew-id.png">${esc(t.idSave)}</a>`;
+    note.textContent=isAndroid?t.idSaveDlAndroid:isIOS?t.idSaveDlIOS:t.idSaveDlPC;
   } else {
     row.innerHTML=`<button class="btn" id="saveId">${esc(t.idSave)}</button>`;
     document.getElementById("saveId").onclick=()=>{
@@ -1269,6 +1301,42 @@ function getDownloads(){
 /* =============== 启动 =============== */
 document.documentElement.lang = S.lang==="zh"?"zh-CN":"en";
 document.title = T().title;
+/* =============== 进度保存：只存在填写者自己手机的浏览器里，7 天后过期 =============== */
+Object.assign(I18N.zh,{idSavePhone:"保存到相册",
+  idSaveInApp:"在微信或小红书里，请长按上面的身份证图片，选「保存图片」，图片会存进手机相册。",
+  idSaveIOS:"点「保存到相册」后，在弹出的菜单里选「存储图像」，图片会存进「照片」App。也可以直接长按图片保存。",
+  idSaveAndroid:"点「保存到相册」后，在弹出的菜单里选择相册或文件管理。也可以直接长按图片，选「保存图片」。",
+  idSaveDlAndroid:"图片会下载到手机存储的「Download（下载）」文件夹。想直接存进相册，可以长按图片选「保存图片」。",
+  idSaveDlIOS:"图片会下载到「文件」App 的「下载」文件夹。想存进「照片」，可以长按图片选「存储到照片」。",
+  idSaveDlPC:"图片会下载到电脑的「下载」文件夹，文件名是 stardew-id.png。"});
+Object.assign(I18N.en,{idSavePhone:"Save to Photos",
+  idSaveInApp:"In WeChat or Xiaohongshu, long-press the ID card image above and choose Save Image. It goes to your photo album.",
+  idSaveIOS:"Tap Save to Photos, then choose Save Image in the menu. It goes to the Photos app. You can also long-press the image.",
+  idSaveAndroid:"Tap Save to Photos, then pick your gallery or file manager. You can also long-press the image and choose Save image.",
+  idSaveDlAndroid:"The image downloads to your phone's Download folder. To put it straight into your gallery, long-press the image and choose Save image.",
+  idSaveDlIOS:"The image downloads to the Downloads folder in the Files app. To put it in Photos, long-press the image and choose Save to Photos.",
+  idSaveDlPC:"The image downloads to your computer's Downloads folder as stardew-id.png."});
+Object.assign(I18N.zh,{resumeAt:(n,t)=>`欢迎回来！你上次答到第 ${n} 题（共 ${t} 题），要接着答吗？`,resumeLast:(t)=>`欢迎回来！你上次已经答完 ${t} 题，只差最后一个问题。`,
+  resumeDone:"欢迎回来！你上次的测试结果还在。",resumeGo:"接着答",resumeSee:"查看结果",resumeRestart:"从头开始",resumeRedo:"重新测一次",
+  resumeNote:"答题进度和填写的内容只保存在你这台设备的浏览器里，7 天后自动清除。"});
+Object.assign(I18N.en,{resumeAt:(n,t)=>`Welcome back! You stopped at question ${n} of ${t}. Pick up where you left off?`,resumeLast:(t)=>`Welcome back! You answered all ${t} questions and only the last one is left.`,
+  resumeDone:"Welcome back! Your last result is still here.",resumeGo:"Continue",resumeSee:"See my result",resumeRestart:"Start over",resumeRedo:"Take it again",
+  resumeNote:"Your progress and details are kept only in this device's browser and are cleared after 7 days."});
+const SAVE_KEY="sdq-progress", SAVE_DAYS=7;
+function saveProgress(){ try{ localStorage.setItem(SAVE_KEY,JSON.stringify({v:1,t:Date.now(),screen:S.screen,idx:S.idx,answers:S.answers,gender:S.gender,farmer:S.farmer,idGender:S.idGender||null,idScene:S.idScene||"auto"})); }catch(e){} }
+function loadProgress(){ try{ const d=JSON.parse(localStorage.getItem(SAVE_KEY)||"null"); if(!d||d.v!==1) return null;
+  if(Date.now()-d.t>SAVE_DAYS*864e5){ localStorage.removeItem(SAVE_KEY); return null; } return d; }catch(e){ return null; } }
+let RESUME=null;
+(function(){ const d=loadProgress(); if(!d) return;
+  if(d.farmer) S.farmer=Object.assign({name:"",farm:"",fav:""},d.farmer);
+  S.idGender=d.idGender||null; S.idScene=d.idScene||"auto";
+  if(Array.isArray(d.answers)&&d.answers.length&&["q","gender","result"].includes(d.screen)){
+    // 点了答案后马上离开时，idx 可能还没前进：从第一道没答的题接着来
+    if(d.screen==="q"){ d.idx=Math.max(d.idx,d.answers.length); if(d.idx>=QUESTIONS.length){ d.screen="gender"; d.idx=QUESTIONS.length-1; } }
+    RESUME=d; } })();
+document.addEventListener("input",()=>setTimeout(saveProgress,0));
+document.addEventListener("click",()=>setTimeout(saveProgress,0));
+
 renderHud(); render();
 
 Object.assign(I18N.zh,{fgT:"你的农夫形象",fgSub:"选一个和你一样的农夫，居民证上会用这张形象。",fgM:"男生",fgF:"女生",fgPick:"先在上面选一个男生或女生的形象。",fgScene:"背景",fgSub:"选一个和你一样的农夫。背景默认按你得分最高的性格来配，也可以自己换。"});
