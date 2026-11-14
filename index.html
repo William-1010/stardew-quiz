@@ -13,7 +13,7 @@
 }
 *{box-sizing:border-box}
 html,body{margin:0;min-height:100%}
-body{font-family:"FusionPixel","Noto Sans SC",monospace;color:var(--ink);font-size:16px;line-height:1.6;
+body{font-family:"PingFang SC","Hiragino Sans GB","Microsoft YaHei","Noto Sans SC",system-ui,sans-serif;color:var(--ink);font-size:16px;line-height:1.6;
   -webkit-font-smoothing:none;font-smooth:never;padding:64px 12px 40px;background:#78c6f0}
 #bg{position:fixed;inset:0;width:100vw;height:100vh;object-fit:cover;image-rendering:pixelated;z-index:0}
 img,svg,canvas{image-rendering:pixelated}
@@ -138,7 +138,7 @@ input:focus{outline:none;box-shadow:inset 0 0 0 3px var(--accent),inset 3px 3px 
 .chip{font-size:13px;background:var(--paper2);padding:3px 9px}
 .note{font-size:14px;color:var(--ink-soft);line-height:1.75}
 .radar-wrap{display:flex;flex-direction:column;align-items:center}
-.radar-wrap text{font-family:"FusionPixel",monospace}
+.radar-wrap text{font-family:"PingFang SC","Microsoft YaHei","Noto Sans SC",sans-serif}
 .legend{display:flex;gap:18px;font-size:14px;color:var(--ink-soft)}
 .legend i{display:inline-block;width:12px;height:12px;margin-right:6px;vertical-align:-1px}
 .mbti-big{font-size:40px;letter-spacing:6px;text-align:center;color:var(--wood-dd);margin:0 0 8px}
@@ -219,6 +219,19 @@ button.other:hover{background:#fff3d6}
   .ov-title{font-size:32px}
   .kv{grid-template-columns:4.5em 1fr}
 }
+
+/* 像素字体 Fusion Pixel 10px 只在 10 的整数倍字号下清晰：标题用它，正文用系统黑体 */
+.logo-big,.h2,.big,.card h3,.mbti-big,.ov-title,.bname,.pct,.result-head,.mside b,.letter-head,h4{font-family:"FusionPixel","PingFang SC","Microsoft YaHei",sans-serif;font-weight:400;-webkit-font-smoothing:none;font-smooth:never}
+.h2{font-size:30px}.big{font-size:40px}.bname{font-size:20px}.letter-head{font-size:20px}h4{font-size:20px}.result-head{font-size:20px}
+.logo-big{font-size:40px}
+.logo-big{text-wrap:balance}
+@media (max-width:540px){.logo-big{font-size:30px;letter-spacing:0;text-shadow:2px 0 0 var(--wood-dd),-2px 0 0 var(--wood-dd),0 2px 0 var(--wood-dd),0 -2px 0 var(--wood-dd),2px 2px 0 var(--wood-dd),-2px 2px 0 var(--wood-dd),2px -2px 0 var(--wood-dd),-2px -2px 0 var(--wood-dd),0 5px 0 #3a1f0c}.ov-title{font-size:30px}.h2{font-size:30px}.big{font-size:30px}.mbti-big{font-size:30px}}
+.qtext{font-weight:500}
+.gpick{display:flex;gap:16px;justify-content:center;margin:8px 0 4px}
+.gopt{font:inherit;display:grid;justify-items:center;gap:6px;padding:10px 12px;background:#fff8e6;border:none;cursor:pointer;box-shadow:0 0 0 3px var(--paper3);color:var(--ink)}
+.gopt img{width:100px;height:150px;object-fit:cover;display:block}
+.gopt.on{box-shadow:0 0 0 3px #fff8e6,0 0 0 7px var(--accent)}
+.gopt span{font-size:16px}
 </style>
 </head>
 <body>
@@ -291,7 +304,7 @@ const I18N = {
     lean:["接近中间","略偏","明显","非常明显"], radarYou:"你（实线红色）", radarHint:(n)=>`分数越靠外越高。红色是你，蓝色是${n}。`, gapT:"你们差别最大的地方：", photoBusy:"正在把照片画成像素画……",
     selfExcluded:(n)=>`你自己就是${n}，所以名单里没有TA。`,
     idT:"星露谷身份证",
-    idSub:"填好下面的信息，再捏一张居民证件照，就能生成你的星露谷身份证。",
+    idSub:"填好下面的信息，再选一个农夫形象，就能生成你的星露谷身份证。",
     idUpload:"选择照片", idChange:"换一张照片", idMake:"生成身份证",
     idNoPhoto:"没有照片也可以，会用你的居民徽章代替头像。",
     avT:"居民证件照", avSub:"上传一张正脸照片，会识别你的脸型、发型、发色、肤色、眼睛、表情和衣服颜色，再画一张属于你的像素证件照。照片只在你自己的浏览器里分析，不会上传。不传照片也可以，直接在下面捏一个。",
@@ -378,7 +391,7 @@ const I18N = {
     lean:["Near the middle","Slight lean","Clear lean","Strong lean"], radarYou:"You", radarHint:(n)=>`Further out means higher. Red is you, blue is ${n}.`, gapT:"Where you differ most: ", photoBusy:"Turning your photo into pixel art…",
     selfExcluded:(n)=>`You are ${n}, so ${n} isn't on the list.`,
     idT:"Stardew ID card",
-    idSub:"Fill in the details below and make your resident photo to get your Stardew ID card.",
+    idSub:"Fill in the details below and pick your farmer to get your Stardew ID card.",
     idUpload:"Choose a photo", idChange:"Change photo", idMake:"Make my ID",
     idNoPhoto:"No photo? No problem, we'll use your villager badge instead.",
     avT:"Resident photo", avSub:"Upload a front-facing photo and we'll read your face shape, hairstyle, hair colour, skin tone, eyes, expression and shirt colour, then draw a pixel portrait that's yours. The photo is analysed in your own browser and never uploaded. No photo? Build one by hand below.",
@@ -1077,7 +1090,6 @@ app.addEventListener("click",e=>{ const b=e.target.closest("[data-prof]"); if(b)
 let lastShare="";
 function renderResult(){
   const R=S.result, t=T(), id=R.me.id, c=CHARS[id], cz=C(id), best=R.spouses[0], bz=C(best.id);
-  if(!S.avatar) S.avatar=avDefault();
   setSeason("sp");
   const shared=sharedTraits(R.tz,NORM.ctrait[id]), bestShared=sharedTraits(R.tz,NORM.ctrait[best.id]);
   const sameType=Object.keys(CHARS).filter(k=>CHARS[k].mbti===R.type).map(k=>C(k).name);
@@ -1145,14 +1157,12 @@ function renderResult(){
           <label><span>${esc(t.fFarm)}</span><span class="row"><input id="cFarm" maxlength="10" value="${esc(S.farmer.farm)}" placeholder="${esc(t.phFarm)}"><em>${esc(t.farmSuffix)}</em></span></label>
           <label><span>${esc(t.fFav)}</span><input id="cFav" maxlength="12" value="${esc(S.farmer.fav)}" placeholder="${esc(t.phFav)}"></label>
         </div>
-        <h4>${esc(t.avT)}</h4>
-        <p class="note" style="margin-top:0">${esc(t.avSub)}</p>
-        <div class="actions">
-          <button class="btn ghost" id="avRandM">${esc(t.avRandM)}</button>
-          <button class="btn ghost" id="avRandF">${esc(t.avRandF)}</button>
+        <h4>${esc(t.fgT)}</h4>
+        <p class="note" style="margin-top:0">${esc(t.fgSub)}</p>
+        <div class="gpick" role="radiogroup" aria-label="${esc(t.fgT)}">
+          ${["m","f"].map(g=>`<button class="gopt ${S.idGender===g?"on":""}" data-fg="${g}" role="radio" aria-checked="${S.idGender===g}"><img src="${FARMER_IMG[g]}" alt="" width="100" height="150"><span>${esc(g==="m"?t.fgM:t.fgF)}</span></button>`).join("")}
         </div>
-        <p class="note center" id="avNote" aria-live="polite"></p>
-        <div id="avEdit"></div>
+        <p class="note center" id="fgNote" aria-live="polite"></p>
         <div class="actions"><button class="btn" id="mkId">${esc(t.idMake)}</button></div>
         <div id="cardOut" class="center"></div>
       </section>
@@ -1166,12 +1176,16 @@ function renderResult(){
       <div class="sources"><b>${esc(t.srcT)}</b><br>${t.src.map(esc).join("<br>")}
         <br><a href="https://stardewvalleywiki.com/" target="_blank" rel="noopener">Stardew Valley Wiki</a> · <a href="https://zh.stardewvalleywiki.com/" target="_blank" rel="noopener">${S.lang==="zh"?"星露谷物语中文维基":"Stardew Valley Wiki (Chinese)"}</a> · <a href="https://www.personalitopia.com/stardew-valley-mbti-types/" target="_blank" rel="noopener">Personalitopia</a> · <a href="https://github.com/TakWolf/fusion-pixel-font" target="_blank" rel="noopener">Fusion Pixel Font</a></div>
     </div>`;
-  document.getElementById("again").onclick=()=>{ sfx("pick"); S.avatar=null; S.cardMade=false; goto("intro"); };
+  document.getElementById("again").onclick=()=>{ sfx("pick"); S.idGender=null; S.cardMade=false; goto("intro"); };
   document.getElementById("copy").onclick=async()=>{ const el=document.getElementById("toast");
     try{ await navigator.clipboard.writeText(lastShare); el.textContent=t.copied; }catch(e){ el.textContent=lastShare; } };
   ["cName","cFarm","cFav"].forEach((k,i)=>document.getElementById(k).oninput=e=>{ S.farmer[["name","farm","fav"][i]]=e.target.value.trim(); });
-  bindAvatar();
-  document.getElementById("mkId").onclick=()=>{ sfx("pick"); makeCard(); };
+  document.querySelectorAll("[data-fg]").forEach(b=>b.onclick=()=>{ S.idGender=b.dataset.fg; sfx("pick");
+    document.querySelectorAll("[data-fg]").forEach(o=>{ const on=o.dataset.fg===S.idGender; o.classList.toggle("on",on); o.setAttribute("aria-checked",on); });
+    document.getElementById("fgNote").textContent=""; if(S.cardMade) makeCard(true); });
+  document.getElementById("mkId").onclick=()=>{ sfx("pick");
+    if(!S.idGender){ const n=document.getElementById("fgNote"); n.textContent=T().fgPick; n.scrollIntoView({behavior:"smooth",block:"center"}); return; }
+    makeCard(); };
   if(S.cardMade) makeCard(true);
 }
 
@@ -1181,11 +1195,12 @@ function idNumber(){
   let h=7; for(const ch of str) h=(h*31+ch.codePointAt(0))%1000000;
   return "PT-"+String(h).padStart(6,"0");
 }
+const SANSF='"PingFang SC","Hiragino Sans GB","Microsoft YaHei","Noto Sans SC",system-ui,sans-serif';
 async function makeCard(quiet){
   S.cardMade=true;
   const t=T(), tc=t.card, R=S.result, id=R.me.id, best=R.spouses[0];
   try{ await document.fonts.load('20px "FusionPixel"'); }catch(e){}
-  const W2=720, H2=440, cv=document.createElement("canvas"); cv.width=W2; cv.height=H2; const g=cv.getContext("2d");
+  const W2=720, H2=470, cv=document.createElement("canvas"); cv.width=W2; cv.height=H2; const g=cv.getContext("2d");
   g.imageSmoothingEnabled=false;
   const px=(x,y,w,h,col)=>{g.fillStyle=col;g.fillRect(x,y,w,h);};
   // 木框
@@ -1197,28 +1212,28 @@ async function makeCard(quiet){
   g.fillStyle="#fff8e6"; g.font='20px "FusionPixel", monospace'; g.textBaseline="middle"; g.fillText(tc.head,34,41);
   g.textAlign="right"; g.fillText(idNumber(),W2-34,41); g.textAlign="left";
   // 照片
-  const PX=36, PY=80, PS=192;
-  px(PX-6,PY-6,PS+12,PS+12,"#5c3416"); px(PX-2,PY-2,PS+4,PS+4,"#e9c48a");
-  g.drawImage(drawAvatar(S.avatar),PX,PY,PS,PS);
-  // 小鸡和居民徽章
-  g.drawImage(emblemCanvas(id,3),PX+PS-34,PY+PS-34,42,42);
+  const PX=44, PY=80, PW=150, PH=225;
+  px(PX-6,PY-6,PW+12,PH+12,"#5c3416"); px(PX-2,PY-2,PW+4,PH+4,"#e9c48a");
+  try{ const im=await loadFarmer(S.idGender||"m"); g.imageSmoothingEnabled=true; g.imageSmoothingQuality="high"; g.drawImage(im,PX,PY,PW,PH); g.imageSmoothingEnabled=false; }catch(e){}
+  // 居民徽章
+  g.drawImage(emblemCanvas(id,3),PX+PW-30,PY+PH-30,42,42);
   // 文字
   const name=S.farmer.name||t.phName, farm=(S.farmer.farm||t.phFarm)+(S.lang==="zh"?t.farmSuffix:" "+t.farmSuffix), fav=S.farmer.fav||t.phFav;
   const rows=[[tc.name,name],[tc.farm,farm],[tc.fav,fav],[tc.like,C(id).name+(S.lang==="zh"?"（"+C(id).title+"）":"")],[tc.mbti,R.type],[tc.love,C(best.id).name+" ♥ "+pct(best.s)+"%"],[tc.since,tc.sinceV]];
   let y=96; const LX=250, VX=S.lang==="zh"?330:372;
-  rows.forEach(([k,v])=>{ g.fillStyle="#8a5528"; g.font='18px "FusionPixel", monospace'; g.fillText(k,LX,y);
-    g.fillStyle="#3b2412"; g.font='22px "FusionPixel", monospace'; let vv=v; while(g.measureText(vv).width>W2-VX-40 && vv.length>2) vv=vv.slice(0,-2)+"…"; g.fillText(vv,VX,y);
+  rows.forEach(([k,v])=>{ g.fillStyle="#8a5528"; g.font='17px '+SANSF; g.fillText(k,LX,y);
+    g.fillStyle="#3b2412"; g.font='bold 20px '+SANSF; let vv=v; while(g.measureText(vv).width>W2-VX-40 && vv.length>2) vv=vv.slice(0,-2)+"…"; g.fillText(vv,VX,y);
     px(LX,y+14,W2-LX-40,2,"#e9c48a"); y+=34; });
   // 性格条
   const tops=TRAIT_KEYS.map((k,i)=>({k,z:R.tz[i]})).sort((a,b)=>b.z-a.z).slice(0,3);
-  tops.forEach(({k,z},i)=>{ const yy=304+i*36; g.fillStyle="#8a5528"; g.font='16px "FusionPixel", monospace'; g.fillText(t.traits[k],40,yy);
+  tops.forEach(({k,z},i)=>{ const yy=334+i*36; g.fillStyle="#8a5528"; g.font='16px '+SANSF; g.fillText(t.traits[k],40,yy);
     const w=Math.round(Math.max(.1,Math.min(1,(z+2.2)/4.4))*10); for(let j=0;j<10;j++) px(40+j*16,yy+12,12,12,j<w?"#e2574c":"#e9c48a"); });
   // 农场小景
   const cropImg=spriteCanvas(CROPS.plant,CROP_PAL,4);
   for(let i=0;i<6;i++) g.drawImage(cropImg,LX+i*36,H2-74);
   g.drawImage(spriteCanvas(CHICK[0],CHICK_PAL,4),W2-110,H2-90);
   // 页脚
-  g.fillStyle="#8a5528"; g.font='14px "FusionPixel", monospace'; g.textAlign="right"; g.fillText(tc.foot,W2-34,H2-30); g.textAlign="left";
+  g.fillStyle="#8a5528"; g.font='14px '+SANSF; g.textAlign="right"; g.fillText(tc.foot,W2-34,H2-30); g.textAlign="left";
 
   const url=cv.toDataURL("image/png");
   const out=document.getElementById("cardOut");
@@ -1249,491 +1264,10 @@ document.documentElement.lang = S.lang==="zh"?"zh-CN":"en";
 document.title = T().title;
 renderHud(); render();
 
-/* =============== 居民证件照：按性别随机生成，用户在编辑器里调整 =============== */
-const AV_SKIN = ["#fde3cc","#f7d0ab","#efbd90","#e3a97a","#d09162","#b4744a","#8d5636","#663c25"];
-const AV_HAIR = {black:"#2b2222",darkbrown:"#4a3024",brown:"#6e4428",chestnut:"#8f5a30",auburn:"#9c3e28",ginger:"#cf6a2c",
-  blonde:"#e2b65c",platinum:"#efe2b4",grey:"#aaa49c",red:"#c8343a",pink:"#e889b5",purple:"#8a5cc4",blue:"#3f6fc6",green:"#4f9a5a"};
-const AV_SHIRT = ["#e2574c","#f0a030","#f2d45c","#4f9a3a","#3f8a8c","#3f6fc6","#6a4fb0","#d77aa8","#f4efe2","#5a5048","#2f3a52","#8a5528"];
-const AV_STYLES = ["short","sidepart","centerpart","messy","slick","buzz","curly","afro","bangs","bob","pixie","long","wavy","hime","pony","twintails","bun","braid"];
-const AV_EYE = "#2a1d18";
-
-function avDefault(){ return avRandom(Math.random()<.5?"m":"f"); }
-function hex2rgb(h){const n=parseInt(h.slice(1),16);return [n>>16&255,n>>8&255,n&255]}
-function rgb2hex(c){return "#"+c.map(v=>Math.max(0,Math.min(255,Math.round(v))).toString(16).padStart(2,"0")).join("")}
-function shade(h,f){return rgb2hex(hex2rgb(h).map(v=>v*f))}
-function tint(h,f){return rgb2hex(hex2rgb(h).map(v=>v+(255-v)*f))}
-function cdist(a,b){return Math.sqrt(2*(a[0]-b[0])**2+4*(a[1]-b[1])**2+3*(a[2]-b[2])**2)/3}
-function lumc(c){return .299*c[0]+.587*c[1]+.114*c[2]}
-
-/* ---------- 绘制：64×64，参照星露谷立绘的画法（深色描边、两到三层明暗、暖色调），部件都是这里原创的 ---------- */
-const AV_SCENES=["saloon","beach","stars","mine","forest","garden","rain","fields","home"];
-const SCENE_OF_TRAIT={soc:"saloon",art:"beach",sci:"stars",adv:"mine",nat:"forest",care:"garden",edge:"rain",amb:"fields",home:"home"};
-function topTrait(){ const R=S.result; if(!R) return "nat"; let bi=0; R.tz.forEach((v,i)=>{ if(v>R.tz[bi]) bi=i; }); return TRAIT_KEYS[bi]; }
-function autoScene(){ const R=S.result; if(!R) return "forest"; let bi=0; R.tz.forEach((v,i)=>{ if(v>R.tz[bi]) bi=i; }); return SCENE_OF_TRAIT[TRAIT_KEYS[bi]]; }
-function drawScene(set,N,scene){
-  const rect=(x0,y0,w,h,c)=>{ for(let y=y0;y<y0+h;y++) for(let x=x0;x<x0+w;x++) set(x,y,c); };
-  const disc=(cx,cy,r,c)=>{ for(let y=Math.floor(cy-r);y<=cy+r;y++) for(let x=Math.floor(cx-r);x<=cx+r;x++) if((x+.5-cx)**2+(y+.5-cy)**2<=r*r) set(x,y,c); };
-  const rnd=(i)=>{ const v=Math.sin(i*127.1+311.7)*43758.5453; return v-Math.floor(v); };
-  const grad=(top,bot)=>{ for(let y=0;y<N;y++){ const t=y/(N-1), a=hex2rgb(top), b=hex2rgb(bot); rect(0,y,N,1,rgb2hex(a.map((v,i)=>v+(b[i]-v)*t))); } };
-  switch(scene){
-    case "saloon": rect(0,0,N,N,"#7a4a28"); for(let y=3;y<N;y+=6){ rect(0,y,N,1,"#5c3416"); for(let x=(y*7)%13;x<N;x+=13) rect(x,y-5,1,5,"#6a3e1f"); }
-      rect(0,40,N,3,"#5c3416"); rect(0,38,N,2,"#9a6236"); [[4,"#4f9a3a"],[9,"#c9622e"],[14,"#e2c060"],[50,"#8a3a5a"],[55,"#4f9a3a"],[59,"#3f6fc6"]].forEach(([x,c])=>{ rect(x,30,3,8,c); rect(x+1,28,1,2,c); });
-      disc(10,8,7,"#c98a3e"); disc(10,8,4,"#f2d27a"); disc(10,8,2,"#fff3c4"); break;
-    case "beach": grad("#f7c6a0","#f39aa8"); disc(48,30,8,"#ffe39a"); rect(0,34,N,10,"#4f8fd0"); for(let x=0;x<N;x+=5) rect(x+(x%3),36+(x%4),3,1,"#9fd0f0"); rect(0,44,N,20,"#f1d79a"); for(let i=0;i<30;i++) set(Math.floor(rnd(i)*N),46+Math.floor(rnd(i+50)*17),"#dcbf7e"); break;
-    case "stars": grad("#1b2440","#3a3a6a"); for(let i=0;i<45;i++){ const x=Math.floor(rnd(i)*N), y=Math.floor(rnd(i+99)*40); set(x,y,i%7?"#c9d4ff":"#fff6b0"); }
-      disc(50,10,6,"#f4efd0"); disc(53,8,5,"#2a3054"); rect(0,46,N,18,"#2a2f4a"); break;
-    case "mine": rect(0,0,N,N,"#3d2e26"); for(let i=0;i<26;i++){ const x=Math.floor(rnd(i)*N), y=Math.floor(rnd(i+7)*N); disc(x,y,2+rnd(i+3)*3,i%2?"#4e3c31":"#33261f"); }
-      [[6,20,"#7fd4f0"],[56,14,"#c78af0"],[8,48,"#c78af0"],[57,44,"#7fd4f0"]].forEach(([x,y,c])=>{ rect(x,y,2,4,c); rect(x-1,y+2,1,3,c); rect(x+2,y+1,1,3,c); set(x,y,"#ffffff"); }); break;
-    case "forest": grad("#bfe3a8","#8fc97a"); [[2,"#4a7a34"],[14,"#5e8e3e"],[50,"#4a7a34"],[60,"#5e8e3e"]].forEach(([x,c])=>{ rect(x,22,3,42,"#6a4a2c"); disc(x+1,16,9,c); disc(x-3,22,6,c); disc(x+5,21,6,c); });
-      rect(0,54,N,10,"#5f9a46"); for(let i=0;i<20;i++) set(Math.floor(rnd(i)*N),55+Math.floor(rnd(i+5)*8),"#7fbf5e"); break;
-    case "garden": grad("#a9daf2","#d8f0f8"); rect(0,40,N,24,"#6fbf4a"); for(let x=0;x<N;x+=6){ rect(x,32,1,10,"#f4ead2"); } rect(0,34,N,1,"#f4ead2"); rect(0,38,N,1,"#f4ead2");
-      for(let i=0;i<34;i++){ const x=Math.floor(rnd(i)*N), y=42+Math.floor(rnd(i+11)*20); set(x,y,["#f08fb0","#f6d55c","#ffffff","#c78af0"][i%4]); set(x,y+1,"#3f8a2c"); } break;
-    case "rain": grad("#4a4560","#6e6a86"); for(let i=0;i<60;i++){ const x=Math.floor(rnd(i)*N), y=Math.floor(rnd(i+33)*N); set(x,y,"#9fa8c8"); set(x-1,y+1,"#9fa8c8"); set(x-2,y+2,"#8890b0"); } rect(0,52,N,12,"#3a3650"); break;
-    case "fields": grad("#ffcf8a","#ffeec4"); disc(10,30,9,"#ffe7a0"); rect(0,34,N,30,"#8a5a30"); for(let y=36;y<N;y+=4){ rect(0,y,N,1,"#6e4422"); for(let x=(y%8);x<N;x+=5){ set(x,y-1,"#6fbf4a"); set(x+1,y-2,"#4f9a3a"); set(x,y-2,"#6fbf4a"); } } break;
-    case "home": rect(0,0,N,N,"#e9c48a"); for(let x=0;x<N;x+=8) rect(x,0,3,46,"#efd09e"); rect(0,46,N,18,"#a8683a"); for(let x=0;x<N;x+=9) rect(x,46,1,18,"#8a5528");
-      rect(44,8,16,16,"#6a3e1f"); rect(46,10,12,12,"#9fd3ef"); rect(51,10,2,12,"#6a3e1f"); rect(46,15,12,2,"#6a3e1f"); rect(4,10,10,8,"#6a3e1f"); rect(5,11,8,6,"#7fbf5e"); break;
-  }
-}
-/* ---------- 头像渲染 v2：参照星露谷立绘的画法重写 ----------
-   规则来自对官方 64×64 立绘的观察：脸约 26px 宽、下颌收窄；眼睛 7px 宽、两行粗上眼睑；
-   阴影往橙红偏（不是灰），描边用暗红棕 / 暗紫，不用纯黑；头发四阶 + 斜向发丝高光；
-   肩膀从第 48 行起到第 56 行撑满画面。所有部件仍是原创绘制，不含游戏素材。 */
-/* 头像 v3 新增的文案 */
-Object.assign(I18N.zh,{
-  avSub:"上传一张正脸照片，会按你的五官比例、发型轮廓、发色、肤色和瞳色画一张像素证件照；表情和背景会跟着你的答题结果走。照片只在你自己的浏览器里分析，不会上传。不传照片也可以，直接在下面捏一个。",
-  avL:{scene:"背景",expr:"表情",hair:"发型",hairCol:"发色",tips:"发尾挑染",skin:"肤色",face:"脸型",eyes:"眼型",eyeCol:"瞳色",brow:"眉毛",nose:"鼻子",beard:"胡子",glasses:"眼镜",deco:"小装饰",shirt:"衣服",tune:"五官微调"},
-  avHair:{photo:"照片里的发型",short:"短发",sidepart:"侧分",centerpart:"中分",messy:"凌乱短发",slick:"背头",buzz:"寸头",curly:"卷发",afro:"爆炸头",bangs:"齐刘海",bob:"波波头",pixie:"精灵短发",long:"长直发",wavy:"长卷发",hime:"公主切",pony:"马尾",twintails:"双马尾",bun:"丸子头",braid:"侧麻花辫"},
-  avHairPhoto:(n)=>`照片里的发型（接近${n}）`,
-  avFace:{oval:"鹅蛋脸",round:"圆脸",square:"方脸",long:"长脸",heart:"心形脸",diamond:"菱形脸"},
-  avEyes:{almond:"杏眼",round:"圆眼",narrow:"细长眼",droopy:"下垂眼",upturned:"上挑眼",mono:"单眼皮"},
-  avExpr:{smile:"微笑",grin:"大笑",calm:"平静",smug:"得意",shy:"害羞",cool:"酷",surprised:"惊讶",determined:"坚定",dreamy:"出神",content:"满足"},
-  avBrow:{natural:"自然眉",thick:"浓眉",thin:"细眉",straight:"平眉",arched:"挑眉"},
-  avNose:{soft:"普通",dot:"小巧",long:"高挺",wide:"宽鼻"},
-  avBeardT:{none:"无",stubble:"胡茬",mustache:"八字胡",goatee:"山羊胡",full:"络腮胡"},
-  avGlassesT:{none:"无",square:"方框眼镜",round:"圆框眼镜",sun:"墨镜"},
-  avDeco:{blush:"腮红",freckles:"雀斑",mole:"痣",earrings:"耳环",clip:"发夹"},
-  avTune:{fw:"脸宽",jaw:"下颌",len:"脸长",eyeGap:"眼距",browH:"眉高",mouthW:"嘴宽",mouthY:"嘴的位置"},
-  avTuneNote:"上传照片后会按你的五官比例自动填好，也可以自己加减。",
-  avPhotoCol:"照片里取的颜色",
-  avRandM:"随机一个男生", avRandF:"随机一个女生",
-  avSub:"先随机生成一个形象，点上面两个按钮可以换男生或女生，再在下面改发型、脸型、五官和配饰，捏成你自己的样子。表情和背景默认跟着你的答题结果走。"
-});
-Object.assign(I18N.en,{
-  avSub:"Upload a front-facing photo and we'll draw a pixel portrait from your face proportions, hair outline, hair colour, skin tone and eye colour. The expression and background follow your quiz answers. The photo is analysed in your own browser and never uploaded. No photo? Build one by hand below.",
-  avL:{scene:"Background",expr:"Expression",hair:"Hair",hairCol:"Hair colour",tips:"Dyed tips",skin:"Skin",face:"Face",eyes:"Eye shape",eyeCol:"Eye colour",brow:"Brows",nose:"Nose",beard:"Facial hair",glasses:"Glasses",deco:"Extras",shirt:"Shirt",tune:"Fine-tune features"},
-  avHair:{photo:"From photo",short:"Short",sidepart:"Side part",centerpart:"Centre part",messy:"Messy",slick:"Slicked back",buzz:"Buzz cut",curly:"Curly",afro:"Afro",bangs:"Bangs",bob:"Bob",pixie:"Pixie",long:"Long straight",wavy:"Long wavy",hime:"Hime cut",pony:"Ponytail",twintails:"Twin tails",bun:"Bun",braid:"Side braid"},
-  avHairPhoto:(n)=>`Hair from photo (close to ${String(n).toLowerCase()})`,
-  avFace:{oval:"Oval",round:"Round",square:"Square",long:"Long",heart:"Heart",diamond:"Diamond"},
-  avEyes:{almond:"Almond",round:"Round",narrow:"Narrow",droopy:"Droopy",upturned:"Upturned",mono:"Monolid"},
-  avExpr:{smile:"Smile",grin:"Big grin",calm:"Calm",smug:"Smug",shy:"Shy",cool:"Cool",surprised:"Surprised",determined:"Determined",dreamy:"Dreamy",content:"Content"},
-  avBrow:{natural:"Natural",thick:"Thick",thin:"Thin",straight:"Straight",arched:"Arched"},
-  avNose:{soft:"Soft",dot:"Button",long:"Long",wide:"Wide"},
-  avBeardT:{none:"None",stubble:"Stubble",mustache:"Moustache",goatee:"Goatee",full:"Full beard"},
-  avGlassesT:{none:"None",square:"Square glasses",round:"Round glasses",sun:"Sunglasses"},
-  avDeco:{blush:"Blush",freckles:"Freckles",mole:"Beauty mark",earrings:"Earrings",clip:"Hair clip"},
-  avTune:{fw:"Face width",jaw:"Jaw",len:"Face length",eyeGap:"Eye spacing",browH:"Brow height",mouthW:"Mouth width",mouthY:"Mouth position"},
-  avTuneNote:"A photo fills these in from your own proportions. You can nudge them yourself.",
-  avPhotoCol:"Colour from your photo",
-  avRandM:"Random guy", avRandF:"Random girl",
-  avSub:"We start you off with a random farmer. Use the buttons to roll a new guy or girl, then change the hair, face, features and extras below until it looks like you. The expression and background follow your quiz answers by default."
-});
-
-/* ================= 头像 v3：渲染 =================
-   64×64，参照星露谷官方立绘的画法；所有尺寸都以两眼间距（13 格）为单位，
-   照片识别和手动编辑共用同一套参数，所以五官比例不会被拉变形。部件都是原创绘制。 */
-const AV_FACES=["oval","round","square","long","heart","diamond"];
-const AV_EYESH=["almond","round","narrow","droopy","upturned","mono"];
-const AV_BROWS=["natural","thick","thin","straight","arched"];
-const AV_NOSES=["soft","dot","long","wide"];
-const AV_EXPRS=["smile","grin","calm","smug","shy","cool","surprised","determined","dreamy","content"];
-const AV_BEARDS=["none","stubble","mustache","goatee","full"];
-const AV_GLASSES=["none","square","round","sun"];
-const AV_DECOS=["blush","freckles","mole","earrings","clip"];
-const AV_TUNE=["fw","jaw","len","eyeGap","browH","mouthW","mouthY"];
-const AV_TUNE_RANGE={fw:[-3,3],jaw:[-3,3],len:[-3,3],eyeGap:[-1,2],browH:[-2,2],mouthW:[-3,3],mouthY:[-2,2]};
-const AV_EYECOLS=["#2a1d18","#5a3a22","#8a5a2a","#3a6fb0","#2f8a6a","#6a6a7a","#7a3fa0"];
-const AV_FLIPPABLE=["sidepart","pony","braid","pixie","messy","wavy"];
-const EXPR_OF_TRAIT={soc:"grin",art:"dreamy",sci:"calm",adv:"smug",nat:"smile",care:"shy",edge:"cool",amb:"determined",home:"content"};
-const FACE_PRESET={
-  oval:   {W:13.5,j:.80,c:4.6,len:0,  rnd:.65,fore:1},
-  round:  {W:14.4,j:.90,c:6.0,len:-1, rnd:1,  fore:1},
-  square: {W:14.0,j:.96,c:6.8,len:0,  rnd:.25,fore:1},
-  long:   {W:12.9,j:.84,c:4.8,len:2,  rnd:.6, fore:.97},
-  heart:  {W:14.0,j:.70,c:3.6,len:0,  rnd:.45,fore:1.03},
-  diamond:{W:13.6,j:.74,c:4.0,len:.5, rnd:.5, fore:.9}};
-// 表情：eye 眼睛状态，brow [内侧, 外侧] 上下偏移（负数是往上），mouth 嘴型
-const EXPR_SPEC={
-  smile:{eye:"open",brow:[0,0],mouth:"smile"},
-  grin:{eye:"open",brow:[-1,-1],mouth:"grin",blush:1},
-  calm:{eye:"open",brow:[0,0],mouth:"calm"},
-  smug:{eye:"half",brow:[0,0],browL:-1,mouth:"smirk"},
-  shy:{eye:"look",brow:[-1,0],mouth:"small",blush:1},
-  cool:{eye:"half",brow:[1,0],mouth:"flat"},
-  surprised:{eye:"wide",brow:[-2,-2],mouth:"o"},
-  determined:{eye:"open",brow:[1,-1],mouth:"firm"},
-  dreamy:{eye:"half",brow:[-1,0],mouth:"small",blush:1},
-  content:{eye:"closed",brow:[0,0],mouth:"smile",blush:1}};
-
-function avBase(){
-  return {hair:"short",hairCol:"darkbrown",skin:2,face:"oval",eyes:"almond",brow:"natural",nose:"soft",expr:"auto",
-    glasses:"none",beard:"none",blush:false,freckles:false,mole:false,earrings:false,clip:false,
-    shirt:"#4f9a3a",flip:false,tips:null,scene:"auto",eyeCol:"#2a1d18",shirtFromPhoto:null,
-    fw:0,jaw:0,len:0,eyeGap:0,browH:0,mouthW:0,mouthY:0,noseY:0,hairMask:null};
-}
-/* 按性别随机生成一个形象，之后用户可以在编辑器里改 */
-function avRandom(g){
-  const r=a=>a[Math.floor(Math.random()*a.length)], p=x=>Math.random()<x;
-  const male=g!=="f";
-  const natural=["black","black","darkbrown","darkbrown","brown","chestnut","auburn","ginger","blonde","platinum"], fun=["pink","purple","blue","green","red","grey"];
-  const A=Object.assign(avBase(),{
-    gender:male?"m":"f",
-    hair: male? r(["short","short","sidepart","sidepart","messy","slick","buzz","curly","centerpart","afro"])
-              : r(["long","long","wavy","bob","bangs","hime","pony","twintails","bun","braid","centerpart","pixie","curly"]),
-    hairCol: p(.12)? r(fun) : r(natural),
-    skin: Math.floor(Math.random()*AV_SKIN.length),
-    face: male? r(["oval","square","square","long","round","diamond"]) : r(["oval","oval","heart","round","diamond","long"]),
-    eyes: male? r(["almond","almond","narrow","mono","droopy","round"]) : r(["almond","round","round","upturned","droopy","mono"]),
-    brow: male? r(["natural","natural","thick","straight"]) : r(["natural","thin","arched","straight"]),
-    nose: r(AV_NOSES), expr:"auto",
-    glasses: p(.22)? r(["square","round","square"]) : "none",
-    beard: male&&p(.25)? r(["stubble","stubble","mustache","goatee","full"]) : "none",
-    blush: !male&&p(.55), freckles:p(.12), mole:p(.1), earrings:!male&&p(.35), clip:!male&&p(.2),
-    tips: p(.08)? r(["pink","blue","purple","blonde"]) : null,
-    eyeCol: r(AV_EYECOLS.slice(0,3).concat(AV_EYECOLS)), shirt:r(AV_SHIRT), flip:p(.5)});
-  // 五官比例也随机一点点，让每次生成的人不一样
-  ["fw","jaw","len","mouthW"].forEach(k=>{ A[k]=Math.round((Math.random()*2-1)*1.5*2)/2; });
-  A.browH=Math.round(Math.random()*2-1); A.mouthY=Math.round(Math.random()*2-1)*(p(.4)?1:0);
-  if(!male) A.fw=Math.min(A.fw,1);
-  return A;
-}
-function avNorm(A0){
-  const A=Object.assign(avBase(),A0||{});
-  A.eyes=({mid:"almond",big:"round",small:"narrow"})[A.eyes]||A.eyes;
-  if(A.glasses===true) A.glasses="square"; if(!A.glasses) A.glasses="none";
-  if(A.beard===true) A.beard="full"; if(!A.beard) A.beard="none";
-  if(!FACE_PRESET[A.face]) A.face="oval";
-  if(!AV_EYESH.includes(A.eyes)) A.eyes="almond";
-  if(!AV_BROWS.includes(A.brow)) A.brow="natural";
-  if(!AV_NOSES.includes(A.nose)) A.nose="soft";
-  if(A.hair==="photo"&&!A.hairMask) A.hair="short";
-  if(A.hair!=="photo"&&!AV_STYLES.includes(A.hair)) A.hair="short";
-  AV_TUNE.concat(["noseY"]).forEach(k=>{ A[k]=+A[k]||0; });
-  return A;
-}
-function resolveExpr(A){ return (A.expr&&A.expr!=="auto"&&EXPR_SPEC[A.expr]) ? A.expr : (EXPR_OF_TRAIT[topTrait()]||"smile"); }
-function avColor(v,table,fallback){ if(typeof v==="string"&&v[0]==="#") return v; if(table&&table[v]!=null) return table[v]; return fallback; }
-
-function rgb2hsl(c){ let [r,g,b]=c.map(v=>v/255); const mx=Math.max(r,g,b), mn=Math.min(r,g,b); let h=0,s=0,l=(mx+mn)/2;
-  if(mx!==mn){ const d=mx-mn; s=l>.5?d/(2-mx-mn):d/(mx+mn); h=mx===r?(g-b)/d+(g<b?6:0):mx===g?(b-r)/d+2:(r-g)/d+4; h*=60; } return [h,s,l]; }
-function hsl2rgb([h,s,l]){ h=((h%360)+360)%360; const c=(1-Math.abs(2*l-1))*s, x=c*(1-Math.abs((h/60)%2-1)), m=l-c/2;
-  let [r,g,b]=h<60?[c,x,0]:h<120?[x,c,0]:h<180?[0,c,x]:h<240?[0,x,c]:h<300?[x,0,c]:[c,0,x]; return [(r+m)*255,(g+m)*255,(b+m)*255]; }
-function hsh(hex,dl,ds,dh){ const [h,s,l]=rgb2hsl(hex2rgb(hex)); return rgb2hex(hsl2rgb([h+dh,Math.min(1,Math.max(0,s+ds)),Math.max(0,Math.min(1,l*dl))])); }
-function mix(a,b,t){ const A=hex2rgb(a),B=hex2rgb(b); return rgb2hex(A.map((v,i)=>v*(1-t)+B[i]*t)); }
-
-function avPalette(A){
-  const skin=avColor(A.skin,AV_SKIN,AV_SKIN[2]);
-  const P={skin};
-  P.skinH=mix(tint(skin,.28),"#fff6e0",.25);
-  P.skinS=hsh(skin,.86,.20,-5);                       // 阴影往橙红偏
-  P.skinD=hsh(skin,.66,.30,-11);
-  P.skinO=mix(hsh(skin,.40,.30,-18),"#4a1830",.35);   // 暗红棕描边
-  const hc=avColor(A.hairCol,AV_HAIR,AV_HAIR.darkbrown), hs=rgb2hsl(hex2rgb(hc));
-  P.hc=hc;
-  if(hs[1]<.18||hs[2]<.16){  // 黑 / 灰发：阴影和高光往蓝紫偏
-    P.hcL=mix(tint(hc,.24),"#7a6cb0",.36); P.hcS=mix(shade(hc,.80),"#3a2a5c",.35); P.hcD=mix(shade(hc,.55),"#2a1c48",.45); P.hcO=mix(shade(hc,.35),"#160b2e",.55);
-  } else {
-    const warm=hs[0]<70||hs[0]>300;
-    P.hcL=mix(tint(hc,.30),warm?"#fff0b8":"#e0f0ff",.22); P.hcS=hsh(hc,.74,.10,warm?-8:6); P.hcD=hsh(hc,.52,.16,warm?-14:10); P.hcO=mix(hsh(hc,.32,.20,warm?-18:14),"#1a0c34",.40);
-  }
-  const sh=avColor(A.shirt,AV_SHIRT,AV_SHIRT[0]), ss=rgb2hsl(hex2rgb(sh))[1];
-  P.sh=sh; P.shL=tint(sh,.30); P.shS=ss<.15?mix(shade(sh,.78),"#3a3060",.3):hsh(sh,.74,.12,-6); P.shD=ss<.15?mix(shade(sh,.55),"#2a2048",.4):hsh(sh,.52,.18,-10); P.shO=mix(shade(sh,.32),"#180c30",.45);
-  P.eyeD="#2e1c22"; P.white="#fff6f0";
-  const ec=A.eyeCol||"#2a1d18"; P.iris=lumc(hex2rgb(ec))<60?tint(ec,.28):ec; P.pupil=shade(P.iris,.42); P.irisL=tint(P.iris,.5);
-  P.lipD=mix(P.skinD,"#a8303c",.5); P.lipL=mix(skin,"#e8786a",.32); P.mouthIn="#8a2a36";
-  P.blush=mix(skin,"#ff6a7c",.42); P.blushL=mix(skin,"#ff8a94",.25);
-  const lightHair=lumc(hex2rgb(hc))>150;
-  P.brow=lightHair?mix(P.skinD,"#6a4630",.55):P.hcD; P.browT=mix(P.brow,skin,.35);
-  return P;
-}
-
-function avGeom(A){
-  const p=FACE_PRESET[A.face]||FACE_PRESET.oval;
-  const W=Math.max(11.5,Math.min(16.5,p.W+A.fw*.5));
-  const JW=W*Math.max(.55,Math.min(1,p.j+A.jaw*.035)), C=Math.max(2.5,Math.min(8,p.c+A.jaw*.35));
-  const CHIN=Math.round(Math.max(43,Math.min(51,47+p.len+A.len*.8)));
-  const TOP=8, CY=27, CB=36, JY=Math.round(CB+(CHIN-CB)*.45);
-  const hw=(y)=>{ if(y<TOP||y>CHIN) return -1;
-    if(y<=CY){ const t=(CY-y)/(CY-TOP), f=p.fore+(1-p.fore)*(1-t); return W*f*Math.sqrt(Math.max(0,1-t*t)); }
-    if(y<=CB) return W;
-    if(y<=JY){ const t=(y-CB)/(JY-CB), s=t*t*(3-2*t); return W+(JW-W)*s; }
-    const t=(y-JY)/(CHIN-JY+.5), circ=Math.sqrt(Math.max(0,1-t*t)), lin=1-t; return C+(JW-C)*(lin+(circ-lin)*p.rnd); };
-  return {W,JW,C,CHIN,TOP,CY,CB,JY,hw,cx:32};
-}
-
-/* ---- 发型：每种发型生成一张 64×64 的头发遮罩，照片识别的发型直接用遮罩 ---- */
-function hairMaskFor(A,G){
-  const N=64, M=new Uint8Array(N*N), cx=G.cx, W=G.W;
-  if(A.hair==="photo"&&A.hairMask){ for(let i=0;i<N*N;i++) M[i]=A.hairMask.charCodeAt(i)===49?1:0; return M; }
-  const fl=x=>A.flip?2*cx-1-x:x, d=x=>Math.abs(x+.5-cx);
-  const hx=(x,m)=>((((x+101)*2654435761)>>>0)%m);
-  const spike=(x,period,h,ph)=>{ const k=((x+ph)%period+period)%period, c=(period-1)/2; return Math.max(0,h-Math.abs(k-c)*(h/(c||1))); };
-  const put=f=>{ for(let y=0;y<N;y++) for(let x=0;x<N;x++) if(f(x,y)) M[y*N+x]=1; };
-  const inHead=(x,y)=>{ const h=G.hw(y); return h>=0&&d(x)<=h; };
-  const cap=(vol,tuft,seed)=>(x,y)=>{ const dx=(x+.5-cx)/(W+2.3+vol), dy=(y+.5-(G.CY-1))/(G.CY-G.TOP+2.6+vol); let r=1;
-    if(tuft&&dy<.15){ const a=Math.atan2(dy,dx), s=Math.floor((a+Math.PI)/(Math.PI/10)); r=1+[0,.05,.1,.03,.07][hx(s+seed,5)]*tuft; }
-    return dx*dx+dy*dy<=r*r; };
-  const side=x=>d(x)>W-3.5;
-  const style=o=>{ const C=cap(o.vol||0,o.tuft||0,o.seed||0);
-    put((x,y)=>C(x,y)&&y<o.line(x));
-    if(o.side) put((x,y)=>{ const h=G.hw(Math.min(Math.max(y,G.TOP+6),G.CB)); return y>=G.CY-5&&y<o.side&&d(x)>h-(o.sideW||3)&&d(x)<=h+(o.sideOut||2.2); });
-    if(o.back) put((x,y)=>o.back(x,y)&&!inHead(x,y)); };
-  const tilt=x=>{ const X=fl(x); return (X+.5-(cx-W))/(2*W); };
-  switch(A.hair){
-    case "short":     style({vol:.6,tuft:1,seed:1,line:x=>side(x)?30:20+Math.round(spike(x,6,3,1))}); break;
-    case "sidepart":  style({vol:.6,tuft:.6,seed:2,line:x=>side(x)?30:18+Math.round(tilt(x)*9+spike(x,5,2,2))}); break;
-    case "centerpart":style({vol:.8,line:x=>d(x)<1.2?16:side(x)?33:17+Math.min(9,d(x)*.8),side:37,sideW:2.5}); break;
-    case "messy":     style({vol:1.8,tuft:2.2,seed:3,line:x=>side(x)?31:20+[0,2,4,1,3][hx(x*7,5)]}); break;
-    case "slick":     style({vol:.5,line:x=>side(x)?27:16+(d(x)>W-6?2:0)}); break;
-    case "buzz":      style({vol:-1.4,line:x=>d(x)>W-2?26:18}); break;
-    case "curly":     style({vol:2.4,tuft:1.2,seed:2,line:x=>side(x)?35:23+((x%3===0)?2:(x%3===1)?1:0),
-                        back:(x,y)=>((x+.5-cx)/(W+5))**2+((y+.5-(G.CY+1))/(G.CY-G.TOP+5))**2<=1&&y<=G.CY+11}); break;
-    case "afro":      style({vol:5,tuft:1.4,seed:5,line:x=>side(x)?33:21+(x%3?1:0),
-                        back:(x,y)=>((x+.5-cx)/(W+8))**2+((y+.5-24)/23)**2<=1&&y<=41}); break;
-    case "bangs":     style({vol:.8,line:x=>side(x)?34:25+Math.round(spike(x,4,2,0)),side:38,sideW:2,
-                        back:(x,y)=>y>=20&&y<=44&&d(x)<=W+3.5}); break;
-    case "bob":       style({vol:1.2,line:x=>side(x)?40:24+Math.round(spike(x,8,1,0)),side:45,sideW:3.5,sideOut:3,
-                        back:(x,y)=>y>=18&&y<=46&&d(x)<=W+4-(y>42?(y-42)*.6:0)}); break;
-    case "pixie":     style({vol:.9,tuft:1.4,seed:4,line:x=>side(x)?29:20+Math.round(tilt(x)*6+spike(x,3,2,0))}); break;
-    case "long":      style({vol:1.2,line:x=>d(x)<2?17:side(x)?40:20+Math.min(5,(d(x)-2)*.8)+Math.round(spike(x,5,2,1)),side:54,sideW:3,
-                        back:(x,y)=>y>=14&&y<=61&&d(x)<=W+4.5-(y>52?(y-52)*.7:0)&&!(y>=G.CHIN-1&&d(x)<7.5)}); break;
-    case "wavy":      style({vol:1.6,tuft:.6,seed:6,line:x=>side(x)?40:18+Math.round(tilt(x)*8+spike(x,5,2,1)),side:54,sideW:3,sideOut:2.8,
-                        back:(x,y)=>{ const w=W+5+Math.sin(y*.55)*1.3; return y>=14&&y<=61&&d(x)<=w-(y>52?(y-52)*.7:0)&&!(y>=G.CHIN-1&&d(x)<7.5); }}); break;
-    case "hime":      style({vol:.8,line:x=>side(x)?44:25,side:45,sideW:3.5,
-                        back:(x,y)=>y>=14&&y<=61&&d(x)<=W+4-(y>54?(y-54)*.6:0)&&!(y>=G.CHIN-1&&d(x)<7.5)}); break;
-    case "pony":      style({vol:.6,tuft:.6,seed:7,line:x=>{ const X=fl(x); return side(x)?30:20+(X<cx?2:0)+Math.round(spike(x,6,3,3)); },
-                        back:(x,y)=>{ const X=fl(x); return ((X+.5-(cx+W+3))/4.8)**2+((y+.5-36)/13)**2<=1; }}); break;
-    case "twintails": style({vol:.8,line:x=>side(x)?32:24+Math.round(spike(x,4,2,1)),
-                        back:(x,y)=>[-1,1].some(s=>((x+.5-(cx+s*(W+3.5)))/4.2)**2+((y+.5-45)/11)**2<=1)||[-1,1].some(s=>((x+.5-(cx+s*(W+1.5)))/2.6)**2+((y+.5-31)/4)**2<=1)}); break;
-    case "bun":       style({vol:.4,line:x=>side(x)?29:19+Math.round(spike(x,7,1,0))});
-                      put((x,y)=>((x+.5-cx)/6.5)**2+((y+.5-(G.TOP-2))/5)**2<=1); break;
-    case "braid":     style({vol:.6,tuft:.5,seed:8,line:x=>side(x)?32:18+Math.round(tilt(x)*9+spike(x,5,2,2))});
-                      for(let k=0;k<6;k++){ const bx=fl(cx+Math.round(W)-1)+.5, by=43+k*3.2; put((x,y)=>((x+.5-bx)/2.4)**2+((y+.5-by)/1.9)**2<=1); }
-                      put((x,y)=>{ const bx=fl(cx+Math.round(W)-1)+.5; return y>=30&&y<=44&&Math.abs(x+.5-bx)<=2; }); break;
-    default:          style({vol:.6,line:x=>20});
-  }
-  return M;
-}
-
-function drawAvatarGrid(A0, sceneName){
-  const A=avNorm(A0), N=64, G=new Array(N*N).fill(null);
-  const set=(x,y,c)=>{ x=Math.round(x); y=Math.round(y); if(x>=0&&y>=0&&x<N&&y<N) G[y*N+x]=c; };
-  const P=avPalette(A), g=avGeom(A), cx=g.cx, W=g.W;
-  const ex=EXPR_SPEC[resolveExpr(A)];
-  const d=x=>Math.abs(x+.5-cx);
-  const headIn=(x,y)=>{ const h=g.hw(y); return h>=0&&d(x)<=h; };
-  const M=hairMaskFor(A,g), hair=(x,y)=>x>=0&&y>=0&&x<N&&y<N&&M[y*N+x]===1;
-  const paint=(inside,colFn,outline)=>{ for(let y=0;y<N;y++) for(let x=0;x<N;x++){ if(!inside(x,y)) continue;
-    const edge=!inside(x-1,y)||!inside(x+1,y)||!inside(x,y-1)||!inside(x,y+1);
-    set(x,y,edge&&outline?outline:colFn(x,y)); } };
-
-  drawScene(set,N,sceneName);
-
-  // ---- 衣服与肩膀 ----
-  const SH=Math.max(48,g.CHIN+2);
-  const shirtIn=(x,y)=>y>=SH&&d(x)<=10+(y-SH)*3.4;
-  paint(shirtIn,(x,y)=>{ const dd=x+.5-cx, lim=10+(y-SH)*3.4;
-    if(dd>lim*.45) return dd>lim*.92?P.shD:P.shS;
-    if(y===SH+1+Math.max(0,Math.floor((Math.abs(dd)-10)/3.4))&&dd<-8) return P.shL;
-    return P.sh; }, P.shO);
-  const vIn=(x,y)=>y>=SH&&y<=SH+4&&d(x)<=4-(y-SH)*.9;
-  paint(vIn,(x,y)=>y>=SH+2?P.skinS:P.skin,null);
-  for(let y=SH;y<=SH+4;y++){ const k=Math.max(0,Math.round(4-(y-SH)*.9)); set(cx-k-1,y,P.shO); set(cx+k,y,P.shO); set(cx-k-2,y,P.shL); set(cx+k+1,y,P.shD); }
-  // ---- 脖子 ----
-  const nk=Math.max(4,Math.min(5.5,g.C*.85+.5));
-  paint((x,y)=>y>=g.CHIN-3&&y<SH&&d(x)<=nk,(x,y)=>(y===g.CHIN+1)?P.skinD:((x+.5-cx)<-1.5?P.skin:P.skinS),P.skinO);
-  // ---- 耳朵 ----
-  const ey=31;
-  [-1,1].forEach(s=>paint((x,y)=>((x+.5-(cx+s*(W+.4)))/2.5)**2+((y+.5-(ey+3))/3.8)**2<=1&&!headIn(x,y),
-    (x,y)=>(s>0||y>ey+4)?P.skinS:P.skin,P.skinO));
-  if(A.earrings) [-1,1].forEach(s=>{ const x=Math.round(cx+s*(W+.4)-.5), y=ey+7; if(!hair(x,y)){ set(x,y,"#f2c94c"); set(x,y+1,"#c8902a"); } });
-
-  // ---- 头发（整块画，前额 / 鬓角落在脸上的部分也一起画）----
-  const N2=N, colTop=new Int16Array(N2).fill(99); for(let x=0;x<N2;x++) for(let y=0;y<N2;y++) if(M[y*N2+x]){ colTop[x]=y; break; }
-  const texture=A.hair==="curly"||A.hair==="afro";
-  const hx=(x,m)=>((((x+101)*2654435761)>>>0)%m);
-  const hairCol=(x,y)=>{
-    if(A.hair==="buzz"){ const base=mix(P.hc,P.skin,.35); return (x+y)%3?base:mix(base,P.hcS,.5); }
-    const rel=y-colTop[x], dx=(x+.5-cx)/(W+3);
-    const tipRow=!hair(x,y+1)||!hair(x,y+2);
-    const overFace=headIn(x,y+1)&&!hair(x,y+1);
-    if(tipRow&&overFace) return P.hcS;
-    if(dx>.58) return (x+y)%5===0?P.hc:P.hcS;
-    if(dx<-.74) return P.hcS;
-    if(y>g.CB&&!headIn(x,y)){ const k=(x*3+(y>>2))%5; return k===0?P.hcL:k===3?P.hcS:P.hc; }   // 垂下来的发丝
-    const u=x+rel*.38-cx+40, s=Math.floor(u/5), pos=u-s*5, len=8+hx(s,7), start=hx(s+3,3), q=(rel-start)/len;
-    if(s%2===0&&q>=0&&q<1&&dx>-.62&&dx<.52){ const w=q<.15||q>.8?1:q<.3||q>.65?2:3; if(pos<w) return P.hcL; }
-    if(s%2===1&&q>.1&&q<1.3&&pos<1&&dx>-.7) return P.hcS;
-    return P.hc; };
-  const hairOutline=A.hair==="buzz"?mix(P.hcO,P.skinO,.5):P.hcO;
-  paint(hair,hairCol,hairOutline);
-  if(texture) for(let y=0;y<N;y++) for(let x=0;x<N;x++){ if(!hair(x,y)||G[y*N+x]===hairOutline) continue;
-    const u=x%5, v=(y+((x/5|0)%2)*2)%5, c=G[y*N+x];
-    if((u===1&&v===0)||(u===0&&v===1)||(u===2&&v===1)||(u===1&&v===2)) set(x,y,c===P.hcS?P.hc:P.hcL); else if(u===1&&v===1) set(x,y,P.hcS); }
-  if(A.tips&&A.hair!=="buzz"){ const tc=avColor(A.tips,AV_HAIR,"#e889b5"), tcL=tint(tc,.25), tcD=hsh(tc,.6,.1,0);
-    for(let x=0;x<N;x++){ if(d(x)<W-7) continue; let n2=0; for(let y=N-1;y>=0&&n2<5;y--){ if(hair(x,y)&&G[y*N+x]!==hairOutline){ set(x,y,n2===0?tcD:n2<3?tc:tcL); n2++; } else if(n2) break; } } }
-
-  // ---- 脸（被头发盖住的地方不画）----
-  const faceIn=(x,y)=>headIn(x,y)&&!hair(x,y);
-  for(let y=0;y<N;y++) for(let x=0;x<N;x++){ if(!faceIn(x,y)) continue;
-    const h=g.hw(y), dd=x+.5-cx;
-    const edge=!headIn(x-1,y)||!headIn(x+1,y)||!headIn(x,y+1);
-    let c=P.skin;
-    if(dd>h-2.8&&y>g.CY-6) c=(dd>h-1.3&&y>g.CY+2||y>g.CHIN-3)?P.skinD:P.skinS;
-    else if(y>g.CHIN-2) c=P.skinS;
-    else if(hair(x,y-1)) c=P.skinS;                                     // 刘海下的阴影
-    else if(dd<-6&&dd>-10&&y>ey+4&&y<ey+8) c=P.skinH;                   // 左颊高光
-    set(x,y,edge?P.skinO:c); }
-
-  // ---- 五官 ----
-  const gap=Math.round(A.eyeGap), exL=cx-10-gap, exR=cx+3+gap;
-  const EYES={
-    almond:  [".DDDDD.","DDDDDDD","DWHIIWD",".WIPIW.","..LLL.."],
-    round:   [".DDDDD.","DDDDDDD","DWHIIWD","DWIPIWD",".WIIIW.","..LLL.."],
-    narrow:  [".DDDDD.","DDDDDDD",".WHPIW.","..LLL.."],
-    droopy:  ["..DDDD.",".DDDDDD","DDHIIWD","DWIPIW.",".LLL..."],
-    upturned:["DDDDD..","DDDDDDD",".WHIIWD","..IPIW.","..LLL.."],
-    mono:    ["DDDDDDD",".DHPID.","..LLL.."]};
-  let rows=EYES[A.eyes]||EYES.almond, edy=A.eyes==="mono"?1:0;
-  if(ex.eye==="closed"){ rows=[".DDDDD.","D.....D"]; edy=1; }
-  else if(ex.eye==="wide"){ rows=[".DDDDD.","DWWWWWD","DWHIIWD","DWIPIWD",".WWWWW.","..LLL.."]; edy=-1; }
-  else if(ex.eye==="half"){ rows=["DDDDDDD"].concat(rows.slice(2)); edy+=1; }
-  const EC={D:P.eyeD,W:P.white,H:P.irisL,I:P.iris,P:P.pupil,L:P.skinS};
-  [[exL,true],[exR,false]].forEach(([x0,left])=>{
-    rows.forEach((row,j)=>{ let r=left?row:row.split("").reverse().join("");
-      if(!left&&r.includes("H")){ r=r.replace("H","I"); const k=r.indexOf("I"); if(k>=0) r=r.slice(0,k)+"H"+r.slice(k+1); }
-      if(ex.eye==="look") r=r.replace(/([IH])P/,"P$1");
-      [...r].forEach((ch,i)=>{ if(EC[ch]) set(x0+i,ey+edy+j,EC[ch]); }); });
-  });
-  // 眉毛：[外侧 → 内侧] 每格的上下偏移
-  const BROW={natural:[1,1,0,0,0,0],thick:[1,1,0,0,0,0],thin:[1,0,0,0,0],straight:[0,0,0,0,0,0],arched:[1,0,-1,-1,0,0]};
-  const bshape=BROW[A.brow]||BROW.natural, by=ey-4-Math.round(A.browH), bcol=A.brow==="thin"?P.browT:P.brow;
-  [[exL,true],[exR,false]].forEach(([x0,left])=>{
-    const n=bshape.length;
-    for(let i=0;i<n;i++){ const t=i/(n-1), off=bshape[i]+Math.round(ex.brow[1]+(ex.brow[0]-ex.brow[1])*t)+(left&&ex.browL?ex.browL:0);
-      const x=left? x0+i+(6-n) : x0+(6-i)-(6-n)+ (n<6?0:0), y=by+off;
-      if(!hair(x,y)) set(x,y,bcol);
-      if(A.brow==="thick"&&i>=2&&!hair(x,y+1)) set(x,y+1,bcol); }
-  });
-  // 鼻子
-  const ny=ey+8+Math.max(-2,Math.min(2,Math.round(A.noseY)));
-  if(A.nose==="dot"){ set(cx+1,ny+1,P.skinS); set(cx+2,ny+1,P.skinD); }
-  else if(A.nose==="long"){ for(let y=ny-3;y<=ny+1;y++) set(cx+1,y,P.skinS); set(cx+2,ny+1,P.skinD); set(cx,ny+1,P.skinS); }
-  else if(A.nose==="wide"){ set(cx+1,ny,P.skinS); set(cx-2,ny+1,P.skinS); set(cx+3,ny+1,P.skinS); set(cx-1,ny+1,P.skinD); set(cx+2,ny+1,P.skinD); }
-  else { set(cx+1,ny,P.skinS); set(cx+1,ny+1,P.skinS); set(cx+2,ny+1,P.skinD); set(cx+2,ny,P.skinS); }
-  // 嘴
-  const my=Math.min(g.CHIN-3,ey+12+Math.max(-2,Math.min(2,Math.round(A.mouthY)))), mw=Math.max(3,Math.min(6,4+Math.round(A.mouthW/2)));
-  const L0=cx-mw, R0=cx+mw-1, line=(a,b,y,c)=>{ for(let x=a;x<=b;x++) set(x,y,c); };
-  switch(ex.mouth){
-    case "calm":  line(L0+1,R0-1,my,P.lipD); line(cx-2,cx+1,my+1,P.lipL); break;
-    case "firm":  line(L0,R0,my,P.lipD); line(cx-2,cx+1,my+1,P.lipL); break;
-    case "flat":  line(L0+2,R0-2,my,P.lipD); break;
-    case "small": set(L0+1,my-1,P.lipD); set(R0-1,my-1,P.lipD); line(L0+2,R0-2,my,P.lipD); set(cx-1,my+1,P.lipL); set(cx,my+1,P.lipL); break;
-    case "smirk": line(L0+2,R0-1,my,P.lipD); set(R0,my-1,P.lipD); set(cx,my+1,P.lipL); break;
-    case "o":     line(cx-1,cx,my-1,P.lipD); set(cx-2,my,P.lipD); set(cx+1,my,P.lipD); line(cx-1,cx,my,P.mouthIn); set(cx-2,my+1,P.lipD); set(cx+1,my+1,P.lipD); line(cx-1,cx,my+1,P.mouthIn); line(cx-1,cx,my+2,P.lipD); break;
-    case "grin":  set(L0,my-1,P.lipD); set(R0,my-1,P.lipD); line(L0+1,R0-1,my-1,P.lipD); set(L0,my,P.lipD); set(R0,my,P.lipD); line(L0+1,R0-1,my,P.white);
-                  set(L0+1,my+1,P.lipD); set(R0-1,my+1,P.lipD); line(L0+2,R0-2,my+1,P.mouthIn); line(L0+2,R0-2,my+2,P.lipD); break;
-    default:      set(L0,my-1,P.lipD); set(R0,my-1,P.lipD); line(L0+1,R0-1,my,P.lipD); line(cx-2,cx+1,my+1,P.lipL);
-  }
-  // 腮红、雀斑、痣
-  if(A.blush||ex.blush) [[exL-1,ey+7],[exR+5,ey+7]].forEach(([x,y])=>{ for(let i=0;i<3;i++) if(!hair(x+i,y)) set(x+i,y,P.blush); set(x,y-1,P.blushL); set(x+2,y-1,P.blushL); set(x+1,y+1,P.blushL); });
-  if(A.freckles) [[exL,ey+7],[exL+2,ey+8],[exL+4,ey+7],[exR+2,ey+7],[exR+4,ey+8],[exR+6,ey+7]].forEach(([x,y])=>{ if(faceIn(x,y)) set(x,y,mix(P.skinD,"#8a4a2a",.3)); });
-  if(A.mole&&faceIn(exR+5,ey+10)) set(exR+5,ey+10,mix(P.skinO,"#3a2018",.4));
-  // 胡子
-  if(A.beard!=="none"){
-    const bc=(x,y,k)=>k==="stub"?mix(P.skin,P.hcS,.38):((x*3+y)%7===0?P.hcL:((x+y)%4===0?P.hcS:P.hc));
-    for(let y=ny+2;y<=g.CHIN;y++) for(let x=0;x<N;x++){ if(!faceIn(x,y)) continue; const h=g.hw(y), dd=d(x);
-      const lipZone=y>=my-1&&y<=my+2&&dd<mw+.5;
-      const upper=y>=ny+2&&y<=my-1&&dd<mw+1.5, chinZ=y>=my+2&&dd<4.5, jawZ=y>=ny+3&&dd>h-3.5;
-      let on=false, k="";
-      if(A.beard==="stubble"){ on=(upper||chinZ||jawZ||y>=my+2)&&!lipZone&&(x+y)%2===0; k="stub"; }
-      else if(A.beard==="mustache") on=upper&&y>=my-2;
-      else if(A.beard==="goatee") on=(chinZ&&y>=my+2)||(upper&&y>=my-2);
-      else if(A.beard==="full") on=(upper&&y>=my-2)||(y>=my+1&&!lipZone)||jawZ&&y>=ey+8;
-      if(on&&!(lipZone&&A.beard!=="stubble"&&y>=my)) set(x,y,bc(x,y,k)); }
-  }
-  // 眼镜
-  if(A.glasses!=="none"){ const gc="#2a1f2e";
-    [exL,exR].forEach(x0=>{ for(let i=-1;i<=7;i++){ set(x0+i,ey-1,gc); set(x0+i,ey+5,gc); } for(let j=-1;j<=5;j++){ set(x0-1,ey+j,gc); set(x0+7,ey+j,gc); }
-      if(A.glasses==="round"){ [[-1,-1],[7,-1],[-1,5],[7,5]].forEach(([i,j])=>set(x0+i,ey+j,G[(ey+j-(j<0?-1:1))*N+x0+i+(i<0?1:-1)]||P.skin)); }
-      if(A.glasses==="sun"){ for(let i=0;i<=6;i++) for(let j=0;j<=4;j++) set(x0+i,ey+j,j===0&&i<3?"#5a5a7a":"#1e1a2a"); set(x0+1,ey+1,"#8a8aa8"); }
-      else set(x0+6,ey,P.white); });
-    for(let x=exL+8;x<exR-1;x++) set(x,ey+1,gc);
-    const wl=Math.round(cx-W), wr=Math.round(cx+W-1); for(let x=wl;x<exL-1;x++) set(x,ey+1,gc); for(let x=exR+8;x<=wr;x++) set(x,ey+1,gc); }
-  // 发夹
-  if(A.clip){ const fx=Math.round(cx-W+3), fy=Math.max(colTop[fx]+3,17); [[0,-1],[-1,0],[1,0],[0,1]].forEach(([i,j])=>set(fx+i,fy+j,"#f27aa6")); set(fx,fy,"#f2d45c"); set(fx+1,fy-1,"#ffd0e0"); }
-  return {G,N};
-}
-function drawAvatar(A){
-  const {G,N}=drawAvatarGrid(A, A.scene&&A.scene!=="auto"?A.scene:autoScene());
-  const c=document.createElement("canvas"); c.width=c.height=N; const g=c.getContext("2d");
-  for(let y=0;y<N;y++) for(let x=0;x<N;x++){ if(G[y*N+x]){ g.fillStyle=G[y*N+x]; g.fillRect(x,y,1,1); } }
-  return c;
-}
-
-/* ---------- 编辑器 ---------- */
-function avatarEditorHTML(){
-  const t=T(), A=avNorm(S.avatar), L=t.avL;
-  const opt=(key,vals,names)=>vals.map(v=>`<button class="avopt ${A[key]===v?"on":""}" data-av="${key}" data-v="${v}">${esc(names[v])}</button>`).join("");
-  const sw=(key,vals,col)=>vals.map(v=>`<button class="avsw ${A[key]===v?"on":""}" data-av="${key}" data-v="${v}" style="background:${col(v)}" aria-label="${esc(String(v))}"></button>`).join("");
-  const tog=(key)=>`<button class="avopt ${A[key]?"on":""}" data-av="${key}" data-v="toggle">${esc(t.avDeco[key])}</button>`;
-  const photoSw=(key,val)=>(typeof val==="string"&&val[0]==="#")?`<button class="avsw on avphoto" data-av="${key}" data-v="${val}" style="background:${val}" title="${esc(t.avPhotoCol)}" aria-label="${esc(t.avPhotoCol)}"></button>`:"";
-  const shirts=AV_SHIRT.concat(A.shirtFromPhoto&&!AV_SHIRT.includes(A.shirtFromPhoto)?[A.shirtFromPhoto]:[]);
-  const autoExpr=EXPR_OF_TRAIT[topTrait()]||"smile";
-  const hairVals=(A.hairMask?["photo"]:[]).concat(AV_STYLES);
-  const hairNames=Object.assign({},t.avHair,{photo:t.avHair.photo});
-  const tune=AV_TUNE.map(k=>{ const v=A[k]||0, [lo,hi]=AV_TUNE_RANGE[k];
-    return `<div class="avtune"><span>${esc(t.avTune[k])}</span><button class="avopt" data-tune="${k}" data-d="-1" ${v<=lo?"disabled":""} aria-label="−">−</button><b>${v>0?"+":""}${Math.round(v*2)/2}</b><button class="avopt" data-tune="${k}" data-d="1" ${v>=hi?"disabled":""} aria-label="+">+</button></div>`; }).join("");
-  return `<div class="avwrap"><canvas id="avPrev" width="256" height="256" aria-label="${esc(t.avT)}"></canvas>
-    <div class="avctl">
-      <div class="avrow"><span>${L.scene}</span><div><button class="avopt ${!A.scene||A.scene==="auto"?"on":""}" data-av="scene" data-v="auto">${esc(t.avAuto(t.avScene[autoScene()],t.traits[topTrait()]))}</button>${AV_SCENES.map(v=>`<button class="avopt ${A.scene===v?"on":""}" data-av="scene" data-v="${v}">${esc(t.avScene[v])}</button>`).join("")}</div></div>
-      <div class="avrow"><span>${L.expr}</span><div><button class="avopt ${A.expr==="auto"?"on":""}" data-av="expr" data-v="auto">${esc(t.avAuto(t.avExpr[autoExpr],t.traits[topTrait()]))}</button>${opt("expr",AV_EXPRS,t.avExpr)}</div></div>
-      <div class="avrow"><span>${L.hair}</span><div>${opt("hair",hairVals,hairNames)}${AV_FLIPPABLE.includes(A.hair)?`<button class="avopt" data-av="flip" data-v="toggle">⇄</button>`:""}</div></div>
-      <div class="avrow"><span>${L.hairCol}</span><div>${photoSw("hairCol",A.hairCol)}${sw("hairCol",Object.keys(AV_HAIR),k=>AV_HAIR[k])}</div></div>
-      <div class="avrow"><span>${L.tips}</span><div><button class="avopt ${A.tips?"":"on"}" data-av="tips" data-v="none">${esc(t.avNone)}</button>${photoSw("tips",A.tips)}${sw("tips",["ginger","blonde","platinum","red","pink","purple","blue","green"],k=>AV_HAIR[k])}</div></div>
-      <div class="avrow"><span>${L.skin}</span><div>${photoSw("skin",A.skin)}${sw("skin",AV_SKIN.map((_,i)=>i),i=>AV_SKIN[i])}</div></div>
-      <div class="avrow"><span>${L.face}</span><div>${opt("face",AV_FACES,t.avFace)}</div></div>
-      <div class="avrow"><span>${L.eyes}</span><div>${opt("eyes",AV_EYESH,t.avEyes)}</div></div>
-      <div class="avrow"><span>${L.eyeCol}</span><div>${AV_EYECOLS.includes(A.eyeCol)?"":photoSw("eyeCol",A.eyeCol)}${sw("eyeCol",AV_EYECOLS,v=>v)}</div></div>
-      <div class="avrow"><span>${L.brow}</span><div>${opt("brow",AV_BROWS,t.avBrow)}</div></div>
-      <div class="avrow"><span>${L.nose}</span><div>${opt("nose",AV_NOSES,t.avNose)}</div></div>
-      <div class="avrow"><span>${L.beard}</span><div>${opt("beard",AV_BEARDS,t.avBeardT)}</div></div>
-      <div class="avrow"><span>${L.glasses}</span><div>${opt("glasses",AV_GLASSES,t.avGlassesT)}</div></div>
-      <div class="avrow"><span>${L.deco}</span><div>${AV_DECOS.map(tog).join("")}</div></div>
-      <div class="avrow"><span>${L.shirt}</span><div>${sw("shirt",shirts,v=>v)}</div></div>
-      <details class="avdet"${S.avTuneOpen?" open":""}><summary>${esc(L.tune)}</summary><p class="note">${esc(t.avTuneNote)}</p><div class="avtunes">${tune}</div></details>
-    </div></div>`;
-}
-function renderAvatarEditor(){
-  const box=document.getElementById("avEdit"); if(!box) return;
-  S.avatar=avNorm(S.avatar);
-  box.innerHTML=avatarEditorHTML();
-  const det=box.querySelector(".avdet"); if(det) det.ontoggle=()=>{ S.avTuneOpen=det.open; };
-  const c=document.getElementById("avPrev").getContext("2d"); c.imageSmoothingEnabled=false; c.drawImage(drawAvatar(S.avatar),0,0,256,256);
-}
-function bindAvatar(){
-  const box=document.getElementById("avEdit"); if(!box) return;
-  box.onclick=e=>{ const A=S.avatar;
-    const tb=e.target.closest("[data-tune]");
-    if(tb){ const k=tb.dataset.tune, [lo,hi]=AV_TUNE_RANGE[k]; A[k]=Math.max(lo,Math.min(hi,Math.round(((+A[k]||0)+(+tb.dataset.d))*2)/2)); sfx("pick"); renderAvatarEditor(); if(S.cardMade) makeCard(true); return; }
-    const b=e.target.closest("[data-av]"); if(!b) return; const k=b.dataset.av, v=b.dataset.v;
-    if(v==="toggle") A[k]=!A[k]; else if(v==="none") A[k]=null; else A[k]= (k==="skin"&&v[0]!=="#") ? +v : v;
-    sfx("pick"); renderAvatarEditor(); if(S.cardMade) makeCard(true); };
-  const regen=g=>{ const keep={scene:S.avatar.scene,expr:S.avatar.expr}; S.avatar=avNorm(Object.assign(avRandom(g),keep)); sfx("pick"); renderAvatarEditor(); if(S.cardMade) makeCard(true); };
-  document.getElementById("avRandM").onclick=()=>regen("m");
-  document.getElementById("avRandF").onclick=()=>regen("f");
-  renderAvatarEditor();
-}
-
+Object.assign(I18N.zh,{fgT:"你的农夫形象",fgSub:"选一个和你一样的农夫，居民证上会用这张形象。",fgM:"男生",fgF:"女生",fgPick:"先在上面选一个男生或女生的形象。"});
+Object.assign(I18N.en,{fgT:"Your farmer",fgSub:"Pick the farmer that matches you. This picture goes on your ID card.",fgM:"Guy",fgF:"Girl",fgPick:"Pick a guy or girl farmer above first."});
+const FARMER_IMG={m:"assets/farmer/m.jpg",f:"assets/farmer/f.jpg"}, FARMER_LOADED={};
+function loadFarmer(g){ if(FARMER_LOADED[g]) return FARMER_LOADED[g]; FARMER_LOADED[g]=new Promise((res,rej)=>{ const im=new Image(); im.onload=()=>res(im); im.onerror=rej; im.src=FARMER_IMG[g]; }); return FARMER_LOADED[g]; }
 preloadPortraits();
 </script>
 </body>
