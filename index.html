@@ -1274,7 +1274,7 @@ renderHud(); render();
 Object.assign(I18N.zh,{fgT:"你的农夫形象",fgSub:"选一个和你一样的农夫，居民证上会用这张形象。",fgM:"男生",fgF:"女生",fgPick:"先在上面选一个男生或女生的形象。",fgScene:"背景",fgSub:"选一个和你一样的农夫。背景默认按你得分最高的性格来配，也可以自己换。"});
 Object.assign(I18N.en,{fgT:"Your farmer",fgSub:"Pick the farmer that matches you. This picture goes on your ID card.",fgM:"Guy",fgF:"Girl",fgPick:"Pick a guy or girl farmer above first.",fgScene:"Background",fgSub:"Pick the farmer that matches you. The background follows your top trait by default, and you can change it."});
 /* =============== 居民证件照：农夫像素形象 + 按性格选背景 =============== */
-const FARMER_IMG={m:"assets/farmer/m.png",f:"assets/farmer/f.png"}, FARMER_LOADED={};
+const FARMER_IMG={m:"assets/farmer/m.png?v=2",f:"assets/farmer/f.png?v=2"}, FARMER_LOADED={};
 function loadFarmer(g){ if(FARMER_LOADED[g]) return FARMER_LOADED[g]; FARMER_LOADED[g]=new Promise((res,rej)=>{ const im=new Image(); im.onload=()=>res(im); im.onerror=rej; im.src=FARMER_IMG[g]; }); return FARMER_LOADED[g]; }
 function hex2rgb(h){const n=parseInt(h.slice(1),16);return [n>>16&255,n>>8&255,n&255]}
 function rgb2hex(c){return "#"+c.map(v=>Math.max(0,Math.min(255,Math.round(v))).toString(16).padStart(2,"0")).join("")}
